@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace APITEST
 {
+    /// <summary>
+    /// 测试提交
+    /// </summary>
     internal class Program
     {
         static async Task Main(string[] args)
