@@ -14,6 +14,7 @@ namespace APITEST
     {
         static async Task Main(string[] args)
         {
+            Console.WriteLine("Start");
             string sPostUrl = "https://localhost:31059/api/v1/sup/record";
             string sToken = "leHAiOjE3NDcyOTkwKk3ckyh_VGijZhsJ7pcJ2u3PNNjIb70uQYGT3tn3bdOQn5MeyXA";
             string sPostData = "[{\"guid\":\"29B6A118AA284812B315F1D58E9089\",\"sCode\":\"A1101100011\",\"ProductName\":\"W-S11\"}]";
