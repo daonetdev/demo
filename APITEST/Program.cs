@@ -1,0 +1,26 @@
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace APITEST
+{
+    internal class Program
+    {
+        static async Task Main(string[] args)
+        {
+            string sPostUrl = "https://localhost:31059/api/v1/sup/record";
+            string sToken = "leHAiOjE3NDcyOTkwKk3ckyh_VGijZhsJ7pcJ2u3PNNjIb70uQYGT3tn3bdOQn5MeyXA";
+            string sPostData = "[{\"guid\":\"29B6A118AA284812B315F1D58E9089\",\"sCode\":\"A1101100011\",\"ProductName\":\"W-S11\"}]";
+            var result = await HttpClientHelper.ExecutePostAuth<PostResult>(sPostUrl, sToken, sPostData);
+            string sJson = JsonJavaScriptSerializer.ToJSON(result);
+            Console.WriteLine(sJson);
+            Console.ReadKey();
+        }
+    }
+}
