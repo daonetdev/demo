@@ -1,10 +1,12 @@
 ﻿using JWTDemo.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 
 namespace JWTDemo.Controllers
 {
@@ -66,6 +68,18 @@ namespace JWTDemo.Controllers
         public IActionResult SecureData()
         {
             return Ok("这是需要认证的API数据");
+        }
+
+
+        [HttpGet("GetData")]
+        //[Authorize]
+        [EnableCors("AllowAll")]
+        public IEnumerable<Student> GetData()
+        {
+            string sFilePath = Path.Combine(AppContext.BaseDirectory, "Data/data.json");
+            using var stream =System.IO.File.OpenRead(sFilePath);
+            var data = JsonSerializer.Deserialize<IEnumerable<Student>>(stream);
+            return data;
         }
 
         private string GenerateJwtToken()

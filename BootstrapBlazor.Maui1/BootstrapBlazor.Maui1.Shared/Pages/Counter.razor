@@ -1,0 +1,54 @@
+﻿@page "/counter"
+@attribute [TabItemOption(Text = "Counter")]
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<Button @OnClick="@IncrementCount">Click me</Button>
+<Button @OnClick="@(async () => await CallAPI())">CallAPI</Button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Home</th>
+        </tr>
+       
+    </thead>
+    <tbody>
+        @foreach (var item in student)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Home</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    [Inject]
+    private HttpClient httpClient { get; set; }
+
+    public List<Student> student { get; set; } = new();
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private async Task CallAPI()
+    {
+        string surl = "https://localhost:7232/api/Auth/GetData";
+        student = await httpClient.GetFromJsonAsync<List<Student>>(surl);
+        InvokeAsync(StateHasChanged);
+    }
+
+
+   
+}
