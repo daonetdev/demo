@@ -1,0 +1,5 @@
+﻿你好，请帮我生成一个你好，请参照仓库：https://github.com/DapperLib/Dapper 写一个访问mysql，
+oracle，sqlserver，sqlite，postgresql的共用类型项目（需提供完整项目结构与完整代码），
+需封装为接口供其它程式调用，框架请使用.net8 ，项目注释请使用中文，
+项目之外需新增不同数据库的使用范例连接字符串需在appsettings.json中配置，
+请依据以上要求给出完整实现代码与项目结构
