@@ -56,7 +56,7 @@ namespace JWTDemo.Controllers
             return data;
         }
 
-        [HttpGet, Route("GetToken1")]
+        [HttpGet("GetToken1")]
         public AuthModel GetToken1()
         {
             return new AuthModel
@@ -70,7 +70,7 @@ namespace JWTDemo.Controllers
             };
         }
 
-        [HttpPost, Route("GetToken2")]
+        [HttpPost ("GetToken2")]
         public AuthModel GetToken2()
         {
             return new AuthModel
