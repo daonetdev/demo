@@ -1,4 +1,5 @@
-﻿using JWTDemo.Models;
+﻿using JWTDemo.Data;
+using JWTDemo.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -10,34 +11,7 @@ using System.Text.Json;
 
 namespace JWTDemo.Controllers
 {
-    //[ApiController]
-    //[Route("[controller]")]
-    //public class AuthController : ControllerBase
-    //{
-    //    private static readonly string[] Summaries = new[]
-    //    {
-    //        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    //    };
-
-    //    private readonly ILogger<AuthController> _logger;
-
-    //    public AuthController(ILogger<AuthController> logger)
-    //    {
-    //        _logger = logger;
-    //    }
-
-    //    [HttpGet(Name = "GetWeatherForecast")]
-    //    public IEnumerable<WeatherForecast> Get()
-    //    {
-    //        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-    //        {
-    //            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-    //            TemperatureC = Random.Shared.Next(-20, 55),
-    //            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-    //        })
-    //        .ToArray();
-    //    }
-    //}
+    
 
     [Route("api/[controller]")]
     [ApiController]
@@ -80,6 +54,34 @@ namespace JWTDemo.Controllers
             using var stream =System.IO.File.OpenRead(sFilePath);
             var data = JsonSerializer.Deserialize<IEnumerable<Student>>(stream);
             return data;
+        }
+
+        [HttpGet, Route("GetToken1")]
+        public AuthModel GetToken1()
+        {
+            return new AuthModel
+            {
+                access_token = Guid.NewGuid().ToString(),
+                token_type = "T",
+                expires_in = 3600,
+                scope = "test",
+                error = "",
+                error_description = ""
+            };
+        }
+
+        [HttpPost, Route("GetToken2")]
+        public AuthModel GetToken2()
+        {
+            return new AuthModel
+            {
+                access_token = Guid.NewGuid().ToString(),
+                token_type = "T2",
+                expires_in = 4000,
+                scope = "test2",
+                error = "",
+                error_description = ""
+            };
         }
 
         private string GenerateJwtToken()
