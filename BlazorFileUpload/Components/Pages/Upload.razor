@@ -1,0 +1,54 @@
+﻿@page "/upload"
+@using BlazorFileUpload.Models
+@inject HttpClient Http
+@inject IWebHostEnvironment Env
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>文件上传</h3>
+
+<InputFile OnChange="(async (e) => await HandleFileSelected(e))" />
+
+@if (uploadResult != null)
+{
+    <p>上传结果: @uploadResult.Message</p>
+}
+
+@code {
+    private UploadResult uploadResult;
+
+    private IBrowserFile selectedFile;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+
+        if (selectedFile != null)
+        {
+            var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(selectedFile.OpenReadStream(1024 * 1024 * 100)); // 10MB chunk size
+
+            content.Add(fileContent, "file", selectedFile.Name);
+
+            var response = await Http.PostAsync("/api/FileUpload/Upload", content);
+            uploadResult = await response.Content.ReadFromJsonAsync<UploadResult>();
+        }
+    }
+
+    // private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    // {
+    //     var file = e.File;
+    //     var chunkSize = 1024 * 1024 * 5; // 5MB
+    //     var totalChunks = (int)Math.Ceiling(file.Size / (double)chunkSize);
+
+    //     for (int i = 0; i < totalChunks; i++)
+    //     {
+    //         var chunk = file.OpenReadStream(chunkSize * i, chunkSize);
+    //         var content = new MultipartFormDataContent();
+    //         content.Add(new StreamContent(chunk), "file", file.Name);
+    //         content.Add(new StringContent(i.ToString()), "chunkIndex");
+    //         content.Add(new StringContent(totalChunks.ToString()), "totalChunks");
+
+    //         await Http.PostAsync("/api/FileUpload/UploadChunk", content);
+    //     }
+    // }
+}
