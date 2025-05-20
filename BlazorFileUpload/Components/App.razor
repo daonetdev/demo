@@ -13,8 +13,27 @@
 </head>
 
 <body>
-    <Routes />
+    <Routes @rendermode="RenderMode.InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
+    <script>
+        window.getElementWidth = (elementId) => {
+            const element = document.getElementById(elementId);
+            return element ? element.offsetWidth : 0;
+        };
+    </script>
+    <script>
+        window.observeElementWidth = (elementId, dotNetHelper) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                const resizeObserver = new ResizeObserver(entries => {
+                    for (let entry of entries) {
+                        dotNetHelper.invokeMethodAsync('OnElementWidthChanged', entry.contentRect.width);
+                    }
+                });
+                resizeObserver.observe(element);
+            }
+        };
+    </script>
 </body>
 
 </html>
