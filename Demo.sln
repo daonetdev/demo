@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorFileUpload", "BlazorF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BootstrapBlazorApp1.Server", "BootstrapBlazorApp1\BootstrapBlazorApp1.Server\BootstrapBlazorApp1.Server.csproj", "{89A05266-DB70-4051-BE61-44550894D79E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketor", "Socketor-main\src\Socketor.csproj", "{38EB8015-3640-79BD-C85D-D97C79F83A21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{89A05266-DB70-4051-BE61-44550894D79E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89A05266-DB70-4051-BE61-44550894D79E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89A05266-DB70-4051-BE61-44550894D79E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38EB8015-3640-79BD-C85D-D97C79F83A21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38EB8015-3640-79BD-C85D-D97C79F83A21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38EB8015-3640-79BD-C85D-D97C79F83A21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38EB8015-3640-79BD-C85D-D97C79F83A21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
