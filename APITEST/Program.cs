@@ -33,8 +33,10 @@ namespace APITEST
                 rng.GetBytes(key);
             }
             var secret = Convert.ToBase64String(key);
-
             Console.WriteLine(secret);
+            var sPWD= Utils.MD5Hash("0B4E7A0E5FE84AD35FB5F95B9CEEAC79");
+
+            Console.WriteLine(sPWD);
 
             Console.ReadKey();
         }
