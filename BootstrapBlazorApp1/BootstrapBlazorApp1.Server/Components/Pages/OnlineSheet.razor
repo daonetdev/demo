@@ -1,16 +1,33 @@
 ﻿@page "/onlineUniverSheet"
 
 
-<div class="bb-online-sheet-demo">
+@* <div class="bb-online-sheet-demo">
     <UniverSheet  @ref="_sheetExcel" Data="@_data" OnReadyAsync="OnReadyAsync"></UniverSheet>
+</div> *@
+@* <div style="height:50vh">
+    <UniverSheet @ref="_sheetExcel" Data="@_data" OnReadyAsync="OnReadyAsync"></UniverSheet>
 </div>
-<section ignore>
 
+<section ignore>
     <Button OnClickWithoutRender="OnPushExcelData" Text="推送数据"></Button>
     <Button OnClickWithoutRender="OnSaveExcelData" Text="保存数据"></Button>
 </section>
 <section ignore>
     <Textarea rows="3" readonly Value="@_jsonData"></Textarea>
+</section> *@
+
+
+<section ignore>
+    <p>点击 <b>推送数据</b> 按钮主动将数据推送给表格，点击 <b>保存数据</b> 按钮获得表格数据序列化的数据</p>
+    <Button OnClickWithoutRender="OnPushExcelData" Text="推送数据"></Button>
+    <Button OnClickWithoutRender="OnSaveExcelData" Text="保存数据"></Button>
 </section>
+<div class="bb-sheet-demo">
+    <UniverSheet @ref="_sheetExcel" OnReadyAsync="OnReadyAsync"></UniverSheet>
+</div>
+<section ignore>
+    <Textarea rows="3" readonly Value="@_jsonData"></Textarea>
+</section>
+
 
 

@@ -52,7 +52,7 @@ namespace BootstrapBlazorApp1.Server.Components.Pages
             if (File.Exists(reportFile))
             {
                 var sheetData = File.ReadAllText(reportFile);
-
+                _reportData = sheetData;
                 _data = new UniverSheetData()
                 {
                     WorkbookData = sheetData
