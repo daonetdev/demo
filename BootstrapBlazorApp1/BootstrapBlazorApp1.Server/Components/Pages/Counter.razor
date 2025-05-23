@@ -1,4 +1,5 @@
 ﻿@page "/counter"
+@using System.Collections.Concurrent
 @attribute [TabItemOption(Text = "Counter")]
 
 <PageTitle>Counter</PageTitle>
@@ -9,11 +10,290 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
+<ValidateForm @ref="ComplexForm" Model="@ComplexModel" OnInvalidSubmit="@OnInvalidComplexModel"
+              OnValidSubmit="@OnValidComplexModel">
+    <div class="row g-3">
+        <div class="col-12 col-sm-6">
+            <BootstrapInput @bind-Value="@ComplexModel.Name" />
+        </div>
+        <div class="col-12 col-sm-6">
+            <BootstrapInput @bind-Value="@ComplexModel.Dummy.Dummy2.Name" />
+        </div>
+        <div class="col-12">
+            <Button ButtonType="@ButtonType.Submit" Text="提交表单" />
+        </div>
+    </div>
+</ValidateForm>
+
 @code {
     private int currentCount = 0;
 
     private void IncrementCount()
     {
         currentCount++;
+    }
+
+    [NotNull]
+    private Foo? Model1 { get; set; }
+
+    [NotNull]
+    private ConsoleLogger? Logger1 { get; set; }
+
+    private async Task OnInvalidSubmit1(EditContext context)
+    {
+        await Task.Delay(1000);
+        Logger1.Log("OnInvalidSubmit 回调委托: 验证未通过");
+    }
+
+    private async Task OnValidSubmit1(EditContext context)
+    {
+        await Task.Delay(1000);
+        Logger1.Log("OnValidSubmit 回调委托: 验证通过");
+    }
+
+    private void OnFiledChanged(string field, object? value)
+    {
+        Logger1.Log($"{field}:{value}");
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        CustomerRules.Add(new FormItemValidator(new EmailAddressAttribute()));
+
+        // 切换线程 模拟异步通过 WEBAPI 加载数据
+        await Task.Yield();
+
+        Model1 = new Foo { Name = "Name", Education = EnumEducation.Primary, DateTime = DateTime.Now };
+        Model2 = new Foo { Name = "Name", Education = EnumEducation.Primary, DateTime = DateTime.Now };
+        Model3 = new Foo { Name = "Name", Education = EnumEducation.Primary, DateTime = DateTime.Now };
+        Model4 = new Foo { Name = "Name", Education = EnumEducation.Primary, DateTime = DateTime.Now };
+        Model7 = new Foo { Name = "Name", Education = EnumEducation.Primary, DateTime = DateTime.Now };
+        Model8 = new Foo { Name = "Name", Education = EnumEducation.Primary, DateTime = DateTime.Now };
+        Model9 = new Foo { Name = "Name", Education = EnumEducation.Primary, DateTime = DateTime.Now };
+        Model10 = new Foo { Name = "Name", Education = EnumEducation.Primary, DateTime = DateTime.Now };
+
+
+        // 初始化参数
+        // Hobbies2 = Foo.GenerateHobbies(LocalizerFoo);
+        // Hobbies3 = Foo.GenerateHobbies(LocalizerFoo);
+        // Hobbies4 = Foo.GenerateHobbies(LocalizerFoo);
+        // Hobbies7 = Foo.GenerateHobbies(LocalizerFoo);
+
+        ComplexModel = new ComplexFoo()
+        {
+            Dummy = new Dummy1() { Dummy2 = new Dummy2() },
+        };
+    }
+
+    [NotNull]
+    private Foo? Model2 { get; set; }
+
+    [NotNull]
+    private IEnumerable<SelectedItem>? Hobbies2 { get; set; }
+
+    [NotNull]
+    private ConsoleLogger? Logger2 { get; set; }
+
+    private async Task OnValidSubmit2(EditContext context)
+    {
+        Logger2.Log("OnValidSubmit 回调委托: Starting ...");
+        await Task.Delay(3000);
+        Logger2.Log("OnValidSubmit 回调委托: Done!");
+    }
+
+    private Task OnInvalidSubmit2(EditContext context)
+    {
+        Logger2.Log("OnInvalidSubmit 回调委托");
+        return Task.CompletedTask;
+    }
+
+    [NotNull]
+    private Foo? Model3 { get; set; }
+
+    [NotNull]
+    private IEnumerable<SelectedItem>? Hobbies3 { get; set; }
+
+    [NotNull]
+    private ValidateForm? FooForm { get; set; }
+
+    private Task OnValidSetError(EditContext context)
+    {
+        FooForm.SetError<Foo>(f => f.Name, "数据库中已存在");
+        return Task.CompletedTask;
+    }
+
+    [NotNull]
+    private Foo? Model4 { get; set; }
+
+    [NotNull]
+    private IEnumerable<SelectedItem>? Hobbies4 { get; set; }
+
+    [NotNull]
+    private ConsoleLogger? Logger4 { get; set; }
+
+    private Task OnInvalidSubmitAddress(EditContext context)
+    {
+        Logger4.Log("OnInvalidSubmit 回调委托");
+        return Task.CompletedTask;
+    }
+
+    [NotNull]
+    private ConsoleLogger? Logger5 { get; set; }
+
+    [NotNull]
+    private ValidateForm? ComplexForm { get; set; }
+
+    [NotNull]
+    private ComplexFoo? ComplexModel { get; set; }
+
+    private ConcurrentDictionary<FieldIdentifier, object?> GetValueChangedFieldCollection() => ComplexForm?.ValueChangedFields ?? new ConcurrentDictionary<FieldIdentifier, object?>();
+
+    private readonly MockModel _mockModel = new() { Email = "argo@live.ca", ConfirmEmail = "argo@163.com" };
+
+    [MetadataType(typeof(MockModelMetadataType))]
+    class MockModel
+    {
+        public string? Email { get; set; }
+
+        public string? ConfirmEmail { get; set; }
+    }
+
+    class MockModelMetadataType : IValidateCollection
+    {
+        private readonly List<string> _validMemberNames = [];
+        private readonly List<ValidationResult> _invalidMemberNames = [];
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            _validMemberNames.Clear();
+            _invalidMemberNames.Clear();
+            if (validationContext.ObjectInstance is MockModel model)
+            {
+                if (!string.IsNullOrEmpty(model.Email) && !string.IsNullOrEmpty(model.ConfirmEmail)
+                    && !model.Email.Equals(model.ConfirmEmail, StringComparison.OrdinalIgnoreCase))
+                {
+                    _invalidMemberNames.Add(new ValidationResult("两个值必须一致。", [nameof(model.Email), nameof(model.ConfirmEmail)]));
+                }
+                else
+                {
+                    _validMemberNames.AddRange([nameof(model.Email), nameof(model.ConfirmEmail)]);
+                }
+            }
+            return GetInvalidMemberNames();
+        }
+
+        public List<string> GetValidMemberNames() => _validMemberNames;
+
+        public List<ValidationResult> GetInvalidMemberNames() => _invalidMemberNames;
+    }
+
+    class ComplexFoo : Foo
+    {
+        [NotNull]
+        public Dummy1? Dummy { get; set; }
+    }
+
+    class Dummy1
+    {
+        [NotNull]
+        public Dummy2? Dummy2 { get; set; }
+    }
+
+    class Dummy2
+    {
+        [Required]
+        public string? Name { get; set; }
+    }
+
+    private Task OnInvalidComplexModel(EditContext context)
+    {
+
+        System.Console.WriteLine("OnInvalidSubmit 回调委托");
+        return Task.CompletedTask;
+    }
+
+    private Task OnValidComplexModel(EditContext context)
+    {
+        System.Console.WriteLine("OnValidSubmit 回调委托");
+        ComplexForm.SetError("Dummy.Dummy2.Name", "数据库中已存在");
+        return Task.CompletedTask;
+    }
+
+    private bool ShowAddress { get; set; }
+
+    [NotNull]
+    private ConsoleLogger? Logger6 { get; set; }
+
+    private Foo DynamicModel { get; set; } = new Foo();
+
+    private Task OnInvalidDynamicModel(EditContext context)
+    {
+        System.Console.WriteLine("OnInvalidSubmit 回调委托");
+        return Task.CompletedTask;
+    }
+
+    private Task OnValidDynamicModel(EditContext context)
+    {
+        System.Console.WriteLine("OnValidSubmit 回调委托");
+        return Task.CompletedTask;
+    }
+
+    private void OnValidateChange()
+    {
+        ShowAddress = true;
+    }
+
+    private void OnValidateReset()
+    {
+        ShowAddress = false;
+    }
+
+    [NotNull]
+    private Foo? Model7 { get; set; }
+
+    [NotNull]
+    private IEnumerable<SelectedItem>? Hobbies7 { get; set; }
+
+    private List<IValidator> CustomerRules { get; } = [];
+
+    [NotNull]
+    private Foo? Model8 { get; set; }
+
+    [NotNull]
+    private Foo? Model9 { get; set; }
+
+    [NotNull]
+    private ValidateForm? ValidatorForm { get; set; }
+
+    private Task OnValidator()
+    {
+        ValidatorForm.Validate();
+        return Task.CompletedTask;
+    }
+
+    [NotNull]
+    private Foo? Model10 { get; set; }
+
+
+    [NotNull]
+    private ConsoleLogger? Logger7 { get; set; }
+
+    private Task OnInvalidValidateCollection(EditContext context)
+    {
+        System.Console.WriteLine("OnInvalidSubmit 回调委托");
+        return Task.CompletedTask;
+    }
+
+    [NotNull]
+    private ConsoleLogger? Logger8 { get; set; }
+
+    private Task OnInvalidValidatableObject(EditContext context)
+    {
+        System.Console.WriteLine("OnInvalidSubmit 回调委托");
+        return Task.CompletedTask;
     }
 }
