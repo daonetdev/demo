@@ -1,0 +1,64 @@
+﻿@using Microsoft.AspNetCore.Http.Features
+@using Microsoft.AspNetCore.Http
+@implements IAsyncDisposable
+@inject IHttpContextAccessor Http
+@inject IJSRuntime JS
+
+@if (showBanner)
+{
+    <div id="cookieConsent" class="alert alert-info alert-dismissible fade show"
+         role="alert">
+        Use this space to summarize your privacy and cookie use policy.
+        <a href="/privacy">Privacy Policy</a>
+        <button type="button" @onclick="AcceptPolicy" class="accept-policy close"
+                data-bs-dismiss="alert" aria-label="Close"
+                data-cookie-string="@cookieString">
+            Accept
+        </button>
+    </div>
+}
+@code {
+    private IJSObjectReference? module;
+    private ITrackingConsentFeature? consentFeature;
+    private bool showBanner;
+    private string? cookieString;
+
+    protected override void OnInitialized()
+    {
+        consentFeature = Http.HttpContext?.Features.Get<ITrackingConsentFeature>();
+        showBanner = !consentFeature?.CanTrack ?? false;
+        cookieString = consentFeature?.CreateConsentCookie();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import",
+                "./CookieConsent.razor.js");
+        }
+    }
+
+    private async Task AcceptPolicy()
+    {
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("acceptPolicy", cookieString);
+            showBanner = false;
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            try
+            {
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+}
