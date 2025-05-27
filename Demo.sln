@@ -31,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Socketor", "Socketor-main\s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookieDemo", "demoCookie\CookieDemo.csproj", "{AEE66A04-E85E-C457-CF5A-5F9D432C2CAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleMCPClient", "ConsoleMCPClient\ConsoleMCPClient.csproj", "{FCA402AF-151B-40FD-8B45-836BE8447A19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleMCPServer", "ConsoleMCPServer\ConsoleMCPServer.csproj", "{29073C7A-C396-4A4D-B32E-67C0B1EC9A2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,14 @@ Global
 		{AEE66A04-E85E-C457-CF5A-5F9D432C2CAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEE66A04-E85E-C457-CF5A-5F9D432C2CAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEE66A04-E85E-C457-CF5A-5F9D432C2CAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCA402AF-151B-40FD-8B45-836BE8447A19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCA402AF-151B-40FD-8B45-836BE8447A19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCA402AF-151B-40FD-8B45-836BE8447A19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCA402AF-151B-40FD-8B45-836BE8447A19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29073C7A-C396-4A4D-B32E-67C0B1EC9A2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29073C7A-C396-4A4D-B32E-67C0B1EC9A2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29073C7A-C396-4A4D-B32E-67C0B1EC9A2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29073C7A-C396-4A4D-B32E-67C0B1EC9A2F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
