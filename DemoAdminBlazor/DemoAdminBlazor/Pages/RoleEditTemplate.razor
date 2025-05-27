@@ -1,0 +1,14 @@
+﻿<div class="row form-inline g-3">
+    <div class="col-12 col-sm-6 col-md-6">
+        <BootstrapInput @bind-Value="Model.Name" />
+    </div>
+    <div class="col-12 col-sm-6 col-md-6">
+        <BootstrapInput @bind-Value="Model.Description" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    [NotNull]
+    public SysRole? Model { get; set; }
+}

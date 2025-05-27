@@ -1,0 +1,17 @@
+@page "/Blog/Classify"
+<AdminTable TItem="Classify" TKey="long" OnBeforeQuery="OnBeforeQuery" EditDialogSize="Size.Large" ShowAdvancedSearch="false" ShowImportButton ShowExportButton ShowExtendButtons IsPagination ShowSearch IsMultipleSelect>
+    <TableColumns>
+        <TableColumn @bind-Field="context.ClassifyName"  Text="专栏名称" Filterable="true" />
+        <TableColumn @bind-Field="context.Thumbnail"  Text="封面图" Filterable="true" />
+        <TableColumn @bind-Field="context.SortCode"  Text="排序" Filterable="true" />
+        <TableColumn @bind-Field="context.ArticleCount"  Text="排序" Filterable="true" />
+        <TableColumn @bind-Field="context.CreatedTime"  Text="创建时间" Filterable="true" />
+    </TableColumns>
+</AdminTable>
+
+@code {
+    private void OnBeforeQuery(AdminQueryEventArgs<Classify> e)
+    {
+
+    }
+}

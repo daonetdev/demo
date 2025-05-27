@@ -1,0 +1,123 @@
+﻿:root {
+    --bb-header-dropdown-border-color: rgba(255,255,255,.5);
+    --bb-header-dropdown-border-hover-color: rgba(255,255,255,.8);
+    --bb-header-dropdown-color: #fff;
+    --bb-header-dropdown-color-rgb: 255, 255, 255;
+    --bb-header-font-size: 1rem;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+    .scroll {
+        scrollbar-color: rgba(0,0,0,0.3) rgba(0,0,0,0);
+        scrollbar-width: thin;
+    }
+}
+
+html,body{
+    height:100%;
+}
+
+.layout {
+    --bb-layout-sidebar-width: 180px;
+}
+    .layout .layout-banner {
+        padding: 0;
+    }
+.layout-title a {
+    font-size: 18px;
+    color: #fff;
+}
+.layout .layout-logo {
+    border: none !important;
+    width: 32px !important;
+}
+.layout .bb-theme-mode .dropdown-toggle {
+    color: var(--bs-navbar-color);
+    border-left: 1px solid #dddddd40;
+}
+.layout .layout-side{
+    z-index:1000;
+}
+.checkbox-list {
+    --bb-checkbox-item-width: 160px;
+}
+.help {color:#fff;}
+    .help i {margin-right:5px;}
+    .help:hover {
+        text-decoration: underline;
+    }
+.breadcrumb {
+    --bs-breadcrumb-divider-color: #fff;
+}
+.breadcrumb-item.active, .breadcrumb-item a {
+    color: #fff;
+}
+
+.split {
+    --bb-split-bar-width: 2px;
+}
+
+.split .split-right {
+    padding-left:15px;
+}
+
+.tree-content:has(div div .level-3) {
+    display:inline-flex;
+}
+
+.captcha-dialog {width:320px;}
+    .captcha-dialog .modal-body {padding:0;}
+
+.upload .upload-body.is-card .upload-item{width:30%;}
+
+.tabs .tabs-body-content {height:100%;}
+
+.layout-main .table-container {
+    height: calc(100vh - 130px);
+}
+
+.table-fixed .table-fixed-body {
+    overflow-y:auto;
+}
+
+.table-container .table tr:last-child td {
+    border-bottom: 1px var(--bs-border-color) solid;
+}
+.table-container .table-wrapper .table thead th {
+    position: sticky;
+    z-index: 4;
+    top: 0;
+}
+
+.modal-dialog-centered, .tox .tox-dialog-wrap {
+    align-items: flex-start !important;
+}
+
+.swal {
+    z-index: 2000;
+}
+    .swal .swal2-content {
+        word-wrap: break-word;
+        word-break: break-all;
+    }
+
+.form-editor.is-invalid {
+    border: 1px var(--bs-danger) solid;
+    border-radius: 10px;
+}
+.form-item.is-invalid {
+    border: 1px var(--bs-danger) solid;
+    border-radius: .475rem;
+}
+
+.scroll {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    scrollbar-gutter: stable;
+}
+
+    .scroll:hover {
+        /* 鼠标悬停时显示垂直滚动条 */
+        overflow-y: auto;
+        overflow-x: auto;
+    }

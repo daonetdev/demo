@@ -1,0 +1,297 @@
+﻿@page "/Admin/User"
+@using DemoAdminBlazor
+@using DemoAdminBlazor.Components
+@using DemoAdminBlazor.Components.Layout
+@using DemoAdminBlazor.Infrastructure
+@using DemoAdminBlazor.Infrastructure.Encrypt
+@inject IStringLocalizer<SysUser> Localizer
+
+<Split Basis="160px" ShowBarHandle="false" IsCollapsible>
+    <FirstPaneTemplate>
+        <TreeView Items="@OrgTreeItems" OnTreeItemClick="OnTreeItemClick" style="margin-right:15px;"></TreeView>
+    </FirstPaneTemplate>
+    <SecondPaneTemplate>
+        <AdminTable @ref="table" @bind-SelectedRows="SelectedItems" IsKeepSelectedRows="true" TItem="SysUser" TKey="long" ShowToolbar EditDialogSize="Size.ExtraLarge" AutoGenerateColumns ShowExportButton ShowExtendButtons ShowAdvancedSearch IsMultipleSelect IsPagination ShowSearch UseDataPermission
+                    IgnoreSearchColumns="x=> x.Roles"
+                    OnBeforeQuery="OnBeforeQuery" OnBeforeSaveAsync="OnBeforeSaveAsync" OnBeforeDeleteAsync="OnBeforeDeleteAsync" OnBeforeImportAsync="OnBeforeImportAsync">
+            <TableToolbarTemplate>
+                @if (isEditAuth)
+                {
+                    <div class="dropdown-export btn-group dropdown">
+                        <button disabled="@(SelectedItems.Count == 0)" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" type="button" title="批量操作">
+                            <span class="d-none d-sm-inline-block">批量操作</span>
+                            <span class="caret"></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end shadow">
+                            <div class="dropdown-item" @onclick="() => OnBatchUserAsync(0)">
+                                <span>@batchButtonText[0]</span>
+                            </div>
+                            <div class="dropdown-item" @onclick="() => OnBatchUserAsync(1)">
+                                <span>@batchButtonText[1]</span>
+                            </div>
+                            <div class="dropdown-item" @onclick="() => OnBatchUserAsync(2)">
+                                <span>@batchButtonText[2]</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </TableToolbarTemplate>
+            <TableColumns>
+                <TableColumn @bind-Field="@context.Password" Visible="false">
+                    <EditTemplate Context="v">
+                        <div class="col-12 col-sm-6">
+                            <BootstrapInput TValue="string" @bind-Value="v.Password" PlaceHolder="请输入 ..." type="password" minlength="6" />
+                        </div>
+                    </EditTemplate>
+                </TableColumn>
+                <TableColumn @bind-Field="@context.OrgId" Visible="false">
+                    <Template Context="v">@v.Row.Org.Label</Template>
+                    <EditTemplate Context="v">
+                        <div class="col-6">
+                            <SelectTree @bind-Value="v.OrgId" Items="@OrgTreeItems" />
+                        </div>
+                    </EditTemplate>
+                </TableColumn>
+                <TableColumn @bind-Field="@context.Roles" Searchable="true" Filterable="false" Order="-1000">
+                    <Template Context="v">
+                        @foreach (var role in v.Value)
+                        {
+                            <Tag>@role.Name</Tag>
+                        }
+                    </Template>
+                    <EditTemplate Context="v">
+                        <div class="col-12">
+                            <AdminCheckboxListGeneric Items="@RoleItems" @bind-Value="@v.Roles" />
+                        </div>
+                    </EditTemplate>
+                    <SearchTemplate Context="v">
+                        <div class="col-12">
+                            <AdminCheckboxListGeneric Items="@RoleItems" @bind-Value="@v.Roles" />
+                        </div>
+                    </SearchTemplate>
+                </TableColumn>
+            </TableColumns>
+        </AdminTable>
+    </SecondPaneTemplate>
+</Split>
+
+<Modal @ref="modal">
+    <ModalDialog ShowSaveButton="true" OnSaveAsync="OnBatchSaveAsync" Size="Size.Small" Title="@batchButtonText[batchType]">
+        <BodyTemplate>
+            @if (batchType == 0)
+            {
+                <AdminCheckboxListGeneric Items="@RoleItems" @bind-Value="batchRoles" class="@(batchValid? "is-invalid":"")" />
+            }
+            @if (batchType == 1)
+            {
+                <SelectTree @bind-Value="batchOrgId" Items="@OrgTreeItems" class="@(batchValid ? "is-invalid" : "")" />
+            }
+            @if (batchType == 2)
+            {
+                <BootstrapInput @bind-Value="batchPwd" PlaceHolder="请输入新密码" class="@(batchValid ? "is-invalid" : "")" />
+            }
+        </BodyTemplate>
+    </ModalDialog>
+</Modal>
+
+@code {
+    [Inject] IAggregateRootRepository<SysUser> _repo { get; set; }
+    [Inject] IAggregateRootRepository<SysOrg> _repoOrg { get; set; }
+    [Inject] IAggregateRootRepository<SysRole> _repRole { get; set; }
+
+    private List<TreeViewItem<long>> OrgTreeItems { get; set; } = new();
+    private List<SelectedItem<SysRole>> RoleItems { get; set; } = new();
+    private List<SysUser> SelectedItems { get; set; } = [];
+    private long orgId{ get; set; }
+    private bool isEditAuth { get; set; }
+    AdminTable<SysUser,long> table;
+
+    // 批量设置
+    string[] batchButtonText = ["设置角色","设置部门","重置密码"];
+    Modal modal;
+    long batchOrgId;
+    List<SysRole> batchRoles;
+    string batchPwd;
+    int batchType;
+    bool batchValid;
+
+    /// <summary>
+    /// 组件初始化时异步执行的方法，用于加载组织树和角色数据。
+    /// </summary>
+    async protected override Task OnInitializedAsync()
+    {
+        isEditAuth = await admin.AuthButton("edit");
+
+        // 并行加载组织和角色数据
+        var orgTask = _repoOrg.Select.ToListAsync();
+        var roleTask = _repRole.Select.ToListAsync();
+
+        await Task.WhenAll(orgTask, roleTask);
+
+        OrgTreeItems = orgTask.Result.BuildTreeViews<SysOrg, long>(0, r => r.Label);
+        RoleItems = roleTask.Result.Select(r => new SelectedItem<SysRole>(r,r.Name)).ToList();
+    }
+
+    /// <summary>
+    /// 查询前的操作
+    /// </summary>
+    /// <param name="e"></param>
+    private void OnBeforeQuery(AdminQueryEventArgs<SysUser> e)
+    {
+        var searchModel = e.options.SearchModel?.ConvertTo<SysUser>() ?? new SysUser();
+        var roleIds = searchModel.Roles?.Select(x => x.Id).ToList();
+
+        e.Select.IncludeMany(a => a.Roles).Include(a => a.Org)
+            .WhereIf(orgId > 0, x => x.OrgId == orgId)
+            .WhereIf(roleIds != null && roleIds.Any(), a => a.Roles.Any(b => roleIds!.Contains(b.Id)));
+    }
+
+    /// <summary>
+    /// 保存前的操作
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    private async Task OnBeforeSaveAsync(AdminSaveEventArgs<SysUser> e)
+    {
+        if (await _repo.Select.AnyAsync(e.ChangedType == ItemChangedType.Add
+            ? x => x.Username == e.Item.Username
+            : x => x.Username == e.Item.Username && x.Id != e.Item.Id))
+        {
+            await SwalService.Error($"用户名{e.Item.Username}已存在。");
+            e.Cancel = true;
+        }
+
+        if (!PBKDF2Encrypt.IsPbkdf2(e.Item.Password))
+        {
+            e.Item.Password = PBKDF2Encrypt.HashPassword(e.Item.Password);
+        }
+    }
+
+    /// <summary>
+    /// 删除前的操作
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    private async Task OnBeforeDeleteAsync(AdminRemoveEventArgs<SysUser> e)
+    {
+        foreach (var item in e.Items)
+        {
+            if (item.Roles.Any(x=>x.IsAdministrator))
+            {
+                await SwalService.Error("超级管理员不允许删除");
+                e.Cancel =true;
+                break; // 一旦发现超级管理员，停止检查后续项
+            }
+        }
+    }
+    /// <summary>
+    /// 按部门筛选
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    private async Task OnTreeItemClick(TreeViewItem<long> item)
+    {
+        orgId = item.Value;
+        await table.Reload();
+    }
+
+    /// <summary>
+    /// 导入前数据处理
+    /// </summary>
+    /// <param name="e"></param>
+    private void OnBeforeImportAsync(AdminImportEventArgs<SysUser> e)
+    {
+        var user = admin?.User;
+
+        if(user != null)
+        {
+            e.Items.ForEach(item =>
+            {
+                item.CreatedUserId = user.Id;
+                item.CreatedUserName = user.Username;
+                item.ModifiedUserId = user.Id;
+                item.ModifiedUserName = user.Username;
+                item.OrgId = user.OrgId;
+            });
+        }
+    }
+
+    /// <summary>
+    /// 批量设置弹窗
+    /// </summary>
+    /// <returns></returns>
+    private async Task OnBatchUserAsync(int type)
+    {
+        batchType = type;
+        await modal.Show();
+    }
+
+    /// <summary>
+    /// 批量设置
+    /// </summary>
+    /// <returns></returns>
+    private async Task<bool> OnBatchSaveAsync()
+    {
+        if (batchType == 0)
+        {
+            batchValid = batchRoles == null;
+            if (batchRoles != null)
+            {
+                foreach (var item in SelectedItems)
+                {
+                    item.Roles.Clear();
+                    item.Roles.AddRange(batchRoles);
+                }
+            }
+        }
+
+        if (batchType == 1)
+        {
+            batchValid = batchOrgId == 0;
+            if (batchOrgId > 0)
+            {
+                foreach (var item in SelectedItems)
+                {
+                    item.OrgId = batchOrgId;
+                }
+            }
+        }
+
+        if (batchType == 2)
+        {
+            batchValid = batchPwd.IsNull();
+            if (!batchPwd.IsNull())
+            {
+                foreach (var item in SelectedItems)
+                {
+                    item.Password = PBKDF2Encrypt.HashPassword(batchPwd);
+                }
+            }
+        }
+
+        await InvokeAsync(StateHasChanged);
+
+        if (!batchValid && await SwalService.Confirm("确定执行吗？", "将批量修改选中的用户"))
+        {
+            if (batchType == 0)
+                await _repo.UpdateAsync(SelectedItems);
+            if (batchType == 1)
+                await _repo.UpdateDiy.SetSource(SelectedItems).UpdateColumns(x => new { x.OrgId }).ExecuteAffrowsAsync();
+            if (batchType == 2)
+                await _repo.UpdateDiy.SetSource(SelectedItems).UpdateColumns(x => new { x.Password }).ExecuteAffrowsAsync();
+
+            var message = $"批量{batchButtonText[batchType]}成功";
+
+            await ToastService.Success("操作成功", message);
+            await table.Reload();
+            batchOrgId = 0;
+            batchRoles = null;
+            batchPwd = "";
+            SelectedItems = [];
+            await InvokeAsync(StateHasChanged);
+            return true;
+        }
+
+        return false;
+    }
+}

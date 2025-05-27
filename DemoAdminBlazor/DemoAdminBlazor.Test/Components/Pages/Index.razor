@@ -1,0 +1,52 @@
+﻿@page "/Admin"
+@using DemoAdminBlazor
+@using DemoAdminBlazor.Components
+@using DemoAdminBlazor.Components.Layout
+@using DemoAdminBlazor.Test.Blog
+@using Markdig
+@attribute [TabItemOption(Text = "主页", Closable = false)]
+
+<PageTitle>主页</PageTitle>
+
+<link href="https://easyadmim.wang-zhan.com.cn/css/doc.css" rel="stylesheet" />
+
+<div class="row">
+    <div class="col-6">
+        
+    </div>
+    <div class="col-6">
+        <Card>
+            <BodyTemplate>
+                <Scroll Height="600px" class="md" style="padding-top:0;">
+                    @((MarkupString)HtmlContent)
+                </Scroll>
+            </BodyTemplate>
+        </Card>
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private HttpClient HttpClient { get; set; }
+
+    string HtmlContent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        
+
+        // // 读取 Markdown 文件内容
+        // string markdownContent = await HttpClient.GetStringAsync("/UpdateVer.md");
+
+        using StreamReader reader = new("wwwroot/UpdateVer.md");
+
+        // Read the stream as a string.
+        string markdownContent = await reader.ReadToEndAsync();
+
+        // 将 Markdown 转换为 HTML
+        var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+        HtmlContent = Markdown.ToHtml(markdownContent, pipeline);
+    }
+}

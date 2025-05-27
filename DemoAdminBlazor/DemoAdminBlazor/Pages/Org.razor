@@ -1,0 +1,80 @@
+﻿@page "/Admin/Org"
+
+<Split Basis="60%" ShowBarHandle="false" IsCollapsible>
+    <FirstPaneTemplate>
+        <AdminTable @ref="orgTable" TItem="SysOrg" TKey="long" EditDialogSize="Size.Large" SortString="Sort Asc,Id Asc"
+                    ExtendButtonColumnWidth="180"
+                    ShowExtendButtons IsTree IsMultipleSelect
+                    OnBeforeQuery="OnBeforeQuery" OnBeforeDeleteAsync="OnBeforeDeleteAsync" style="margin-right:15px;">
+            <TableColumns>
+                <TableColumn @bind-Field="@context.ParentId" Visible="false" IsVisibleWhenAdd="true" IsVisibleWhenEdit="true">
+                    <EditTemplate Context="v">
+                        <SelectTree @bind-Value="v.ParentId" TValue="long" Items="OrgTreeItems" />
+                    </EditTemplate>
+                </TableColumn>
+                <TableColumn @bind-Field="context.Label" Width="220" />
+                <TableColumn @bind-Field="context.Sort" Visible="false" DefaultSort DefaultSortOrder="SortOrder.Desc" />
+                <TableColumn @bind-Field="context.Description" Rows="3" />
+                <TableColumn @bind-Field="context.ResponsibleUser">
+                    <Template Context="v">@v.Value?.Nickname</Template>
+                    <EditTemplate Context="v">
+                        <div class="col-12">
+                            <AdminSelectTable TItem="SysUser" GetText="x => x.Nickname" @bind-Value="v.ResponsibleUser" @bind-ValueId="v.ResponsibleUserId">
+                                <TableColumns Context="sv">
+                                    <TableColumn @bind-Field="sv.Username" Filterable="true" />
+                                    <TableColumn @bind-Field="sv.Nickname" Filterable="true" />
+                                    <TableColumn @bind-Field="sv.Mobile" Filterable="true" />
+                                </TableColumns>
+                            </AdminSelectTable>
+                        </div>
+                    </EditTemplate>
+                </TableColumn>
+                <TableColumn @bind-Field="context.ResponsibleUserId" Text="联系电话" IsVisibleWhenAdd="false" IsVisibleWhenEdit="false">
+                    <Template Context="v">@v.Row.ResponsibleUser?.Mobile</Template>
+                </TableColumn>
+            </TableColumns>
+            <RowButtonTemplate>
+                <TableCellButton Color="Color.Success" Icon="fa-solid fa-plus" Text="增加" OnClick="() => ShowFormDialog(context)" />
+            </RowButtonTemplate>
+        </AdminTable>
+    </FirstPaneTemplate>
+    <SecondPaneTemplate>
+        <Scroll>
+            <h5 class="text-center">组织架构图</h5>
+            <Divider />
+            <AdminOrgChart Items="@OrgTreeItems" />
+        </Scroll>
+    </SecondPaneTemplate>
+</Split>
+
+
+@code {
+    [Inject] IAggregateRootRepository<SysOrg> _repo { get; set; }
+
+    private static List<TreeViewItem<long>> OrgTreeItems { get; set; }
+
+    AdminTable<SysOrg, long> orgTable;
+
+    private async Task OnBeforeQuery(AdminQueryEventArgs<SysOrg> e)
+    {
+        e.Select.Include(x => x.ResponsibleUser);
+
+        OrgTreeItems = (await _repo.Select.OrderBy(a => a.Sort).ToListAsync()).BuildTreeViews<SysOrg, long>(0, r => r.Label);
+    }
+
+    private async Task ShowFormDialog(SysOrg row)
+    {
+        await orgTable.ShowFormDialog(new SysOrg { ParentId = row.Id });
+    }
+
+    /// <summary>
+    /// 删除前的数据处理
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    private async Task OnBeforeDeleteAsync(AdminRemoveEventArgs<SysOrg> e)
+    {
+        // 加载子级以便级联删除
+        await e.Items.IncludeManyAsync(_repo.Orm, a => a.Childs);
+    }
+}

@@ -1,0 +1,18 @@
+@page "/Blog/Tag2"
+<AdminTable TItem="Tag2" TKey="long" OnBeforeQuery="OnBeforeQuery" EditDialogSize="Size.Large" ShowImportButton ShowExportButton ShowExtendButtons ShowAdvancedSearch IsPagination ShowSearch IsMultipleSelect>
+    <TableColumns>
+        <TableColumn @bind-Field="context.TagName"  Text="标签名" Filterable="true" Searchable="true" />
+        <TableColumn @bind-Field="context.Alias"  Text="别名" Filterable="true" Searchable="true" />
+        <TableColumn @bind-Field="context.Status"  Text="Status" Filterable="true" />
+        <TableColumn @bind-Field="context.ArticleCount"  Text="ArticleCount" Filterable="true" />
+        <TableColumn @bind-Field="context.ViewHits"  Text="ViewHits" Filterable="true" />
+        <TableColumn @bind-Field="context.Remark"  Text="备注" Filterable="true" Searchable="true" />
+        <TableColumn @bind-Field="context.CreatedTime"  Text="创建时间" Filterable="true" />
+    </TableColumns>
+</AdminTable>
+
+@code {
+    private void OnBeforeQuery(AdminQueryEventArgs<Tag2> e)
+    {
+    }
+}

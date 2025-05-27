@@ -1,0 +1,40 @@
+﻿@using System.Linq.Expressions
+@using DemoAdminBlazor
+@using DemoAdminBlazor.Components
+@using DemoAdminBlazor.Components.Layout
+@using DemoAdminBlazor.Infrastructure
+@inherits Select<long?>
+@typeparam TItem where TItem : class, IEntity<long>, new()
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    [Inject] IAggregateRootRepository<TItem> repo { get; set; }
+
+    /// <summary>
+    /// Where条件
+    /// </summary>
+    [Parameter]
+    public Expression<Func<TItem, bool>>? Where { get; set; }
+
+    /// <summary>
+    /// SelectedItem获取Text委托
+    /// </summary>
+    [Parameter]
+    public Func<TItem, string> GetText { get; set; } = default!;
+
+    /// <summary>
+    /// OnInitialized 方法
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        ModulePath = "/_content/BootstrapBlazor/Components/Select/Select.razor.js";
+
+        Items ??= (await repo.Select.WhereIf(Where != null, Where).ToListAsync())
+            .Select(r => new SelectedItem(r.Id.ToString(), GetText(r)));
+
+        await base.OnInitializedAsync();
+    }
+}

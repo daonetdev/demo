@@ -1,0 +1,18 @@
+@page "/Blog/Channel"
+<AdminTable TItem="Channel" TKey="long" OnBeforeQuery="OnBeforeQuery" EditDialogSize="Size.Large" ShowImportButton ShowExportButton ShowExtendButtons IsPagination ShowSearch IsMultipleSelect>
+    <TableColumns>
+        <TableColumn @bind-Field="context.ChannelName"  Text="频道名称" Filterable="true" Searchable="true" />
+        <TableColumn @bind-Field="context.ChannelCode"  Text="编码" Filterable="true" Searchable="true" />
+        <TableColumn @bind-Field="context.Thumbnail"  Text="封面图" />
+        <TableColumn @bind-Field="context.Remark"  Text="备注描述" Filterable="true" Searchable="true" />
+        <TableColumn @bind-Field="context.SortCode"  Text="排序" Filterable="true" />
+        <TableColumn @bind-Field="context.Status"  Text="是否有效" Filterable="true" />
+        <TableColumn @bind-Field="context.CreatedTime"  Text="创建时间" Filterable="true" />
+    </TableColumns>
+</AdminTable>
+
+@code {
+    private void OnBeforeQuery(AdminQueryEventArgs<Channel> e)
+    {
+    }
+}

@@ -1,0 +1,133 @@
+﻿@page "/Admin/Menu"
+@using System.Linq.Expressions
+@using DemoAdminBlazor
+@using DemoAdminBlazor.Components
+@using DemoAdminBlazor.Components.Layout
+@using DemoAdminBlazor.Infrastructure
+
+<AdminTable @ref="menuTable" TItem="SysMenu" TKey="long" EditDialogSize="Size.Large" SortString="Sort Asc,Id Asc" ShowExtendButtons IsTree IsMultipleSelect
+            OnBeforeQuery="OnBeforeQuery" OnBeforeSaveAsync="OnBeforeSaveAsync" OnBeforeDeleteAsync="OnBeforeDeleteAsync">
+    <TableToolbarTemplate>
+        <div class="float-end" style="padding-left: 20px; padding-top: 5px;">
+            <Checkbox TValue="bool" State="CheckboxState.Checked" OnValueChanged="async (bool val) => { ShowButtons=val; await menuTable.Reload(); }">
+                <span>显示按钮</span>
+            </Checkbox>
+        </div>
+    </TableToolbarTemplate>
+    <TableColumns>
+        <TableColumn @bind-Field="@context.ParentId" Visible="false" IsVisibleWhenAdd="true" IsVisibleWhenEdit="true">
+            <EditTemplate Context="v">
+                <SelectTree @bind-Value="v.ParentId" TValue="long" Items="MenuTreeItems" OnValueChanged="async (long item) => await OnParentItemChanged(item,v)" />
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn @bind-Field="context.Label">
+            <Template Context="v">
+                <span>@v.Value</span>
+                @if (v.Row.Type == SysMenuType.增删改查)
+                {
+                    <button @onclick="e => BeginDesignCrud(v.Row)" type="button" class="ml-2 btn btn-light btn-xs"><i class="fa fa-user-secret"></i>配置</button>
+                }
+            </Template>
+        </TableColumn>
+        <TableColumn @bind-Field="context.Path" />
+        <TableColumn @bind-Field="context.Icon" />
+        <TableColumn @bind-Field="context.Type" />
+        <TableColumn @bind-Field="context.IsSystem" IsVisibleWhenAdd="false" IsVisibleWhenEdit="false" />
+        <TableColumn @bind-Field="context.Sort" />
+        <TableColumn @bind-Field="context.Buttons" Text="按钮" Visible="false" IsVisibleWhenAdd="true">
+            <EditTemplate Context="v">
+                <div class="col-12 col-sm-12 col-md-12">
+                    <CheckboxList @ref="cblButtons" TValue="IEnumerable<string>" @bind-Value="@v.Buttons" Items="@CudButtons" />
+                </div>
+            </EditTemplate>
+        </TableColumn>
+    </TableColumns>
+</AdminTable>
+
+<AdminTableDesign Menu="menuDesign" OnClose="async () => menuDesign = null" />
+
+@code {
+    [Inject] IAggregateRootRepository<SysMenu> _repo { get; set; }
+
+    AdminTable<SysMenu,long> menuTable;
+
+    CheckboxList<IEnumerable<string>> cblButtons;
+
+    List<TreeViewItem<long>>? MenuTreeItems { get; set; }
+
+    List<SysMenu> Items { get; set; }
+
+    bool ShowButtons { get; set; }
+
+    List<SelectedItem> CudButtons = new[] {
+        new SelectedItem("add","添加"),
+        new SelectedItem("edit","编辑"),
+        new SelectedItem("remove","删除")
+    }.ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        Items = await _repo.Select.Where(x => x.Type != SysMenuType.按钮).OrderBy(a => a.Sort).Where(x => x.Type != SysMenuType.按钮).ToListAsync();
+        MenuTreeItems = Items.BuildTreeViews<SysMenu, long>(0, r => r.Label);
+    }
+
+    /// <summary>
+    /// 查询前的数据处理
+    /// </summary>
+    /// <param name="e"></param>
+    private void OnBeforeQuery(AdminQueryEventArgs<SysMenu> e) => e.Select.WhereIf(!ShowButtons, x => x.Type != SysMenuType.按钮);
+
+    /// <summary>
+    /// 保存前的数据处理
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    private Task OnBeforeSaveAsync(AdminSaveEventArgs<SysMenu> e)
+    {
+        if(e.ChangedType == ItemChangedType.Add)
+        {
+            var sort = 10011;
+            e.Item.Childs = new List<SysMenu>();
+            foreach (var btn in e.Item.Buttons)
+            {
+                var cudBtn = CudButtons.First(x => x.Value == btn);
+                e.Item.Childs.Add(new SysMenu { Label = cudBtn.Text, Path = cudBtn.Value, Sort = sort, Type = SysMenuType.按钮, IsSystem = true, });
+                sort++;
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// 删除前的数据处理
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    private async Task OnBeforeDeleteAsync(AdminRemoveEventArgs<SysMenu> e)
+    {
+        if (e.Items.Any(a => a.IsSystem))
+        {
+            await SwalService.Error("不能删除系统菜单");
+            e.Cancel = true;
+        }
+
+        // 加载子菜单以便级联删除
+        await e.Items.IncludeManyAsync(_repo.Orm, a => a.Childs);
+    }
+
+    SysMenu? menuDesign;
+    void BeginDesignCrud(SysMenu menu)
+    {
+        menuDesign = menu;
+    }
+    private async Task OnParentItemChanged(long menuId,SysMenu item)
+    {
+        var menu = Items.Where(x => x.Id == menuId).First();
+
+        item.Buttons = menu.ParentId > 0 ? [] : ["add", "edit", "remove"];
+    }
+    
+}

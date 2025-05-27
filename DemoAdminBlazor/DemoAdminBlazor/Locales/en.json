@@ -1,0 +1,30 @@
+﻿{
+  "DemoAdminBlazor.Common": {
+    "Import": "Import"
+  },
+  "DemoAdminBlazor.SysUser": {
+    "Username": "Username",
+    "Nickname": "Nickname",
+    "Mobile": "Mobile",
+    "Email": "Email",
+    "Password": "Password",
+    "IsEnabled": "Enabled",
+    "OrgId": "Team",
+    "Description": "Description",
+    "LoginTime": "Last login time",
+    "Roles": "Roles",
+    "RoleIds": "Roles",
+    "CreatedTime": "Created time",
+    "CreatedUserName": "Created user",
+    "ModifiedTime": "Modified time",
+    "ModifiedUserName": "Modified user"
+  },
+  "DemoAdminBlazor.Server.Data.EnumEducation": {
+    "PlaceHolder": "Click to select ...",
+    "Primary": "Primary",
+    "Middle": "Middle"
+  },
+  "DemoAdminBlazor.Components.CultureChooser": {
+    "Label": "Languages: "
+  }
+}

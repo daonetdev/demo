@@ -1,0 +1,42 @@
+﻿@page "/Blog/UserLike"
+<AdminTable TItem="UserLike" TKey="long" EditDialogSize="Size.Large" ShowImportButton ShowExportButton ShowExtendButtons ShowAdvancedSearch="false" IsPagination ShowSearch IsMultipleSelect
+            OnBeforeQuery="OnBeforeQuery" OnBeforeSaveAsync="OnBeforeSaveAsync">
+    <TableColumns>
+        <TableColumn @bind-Field="context.SubjectId"  Text="SubjectId" Filterable="true">
+            <Template Context="v">@v.Row.Article?.Title</Template>
+            <FilterTemplate>
+                <FilterProvider>
+                    <AdminSelectEntityFilter TItem="Article" GetText="x => x.Title" />
+                </FilterProvider>
+            </FilterTemplate>
+            <EditTemplate Context="v">
+                <div class="col-12">
+                    <AdminSelectTable TItem="Article" GetText="x => x.Title" @bind-Value="v.Article">
+                        <TableColumns Context="sv">
+                            <TableColumn @bind-Field="sv.Title" Filterable="true" />
+                        </TableColumns>
+                    </AdminSelectTable>
+                </div>
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn @bind-Field="context.SubjectType"  Text="SubjectType" Filterable="true" />
+        <TableColumn @bind-Field="context.CreatedTime"  Text="创建时间" Filterable="true" />
+    </TableColumns>
+</AdminTable>
+
+@code {
+    private void OnBeforeQuery(AdminQueryEventArgs<UserLike> e)
+    {
+        e.Select.Include(a => a.Article);
+    }
+    private Task OnBeforeSaveAsync(AdminSaveEventArgs<UserLike> e)
+    {
+        if(e.Item.Article != null)
+        {
+            e.Item.SubjectId = e.Item.Article.Id;
+            e.Item.SubjectType = UserLikeSubjectType.点赞随笔;
+        }
+
+        return Task.CompletedTask;
+    }
+}

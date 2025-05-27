@@ -1,0 +1,64 @@
+﻿@using System.Linq.Expressions
+@using DemoAdminBlazor
+@using DemoAdminBlazor.Components
+@using DemoAdminBlazor.Components.Layout
+@using DemoAdminBlazor.Infrastructure
+@inherits FilterBase
+@typeparam TItem where TItem : class, IEntity<long>, new()
+
+<AdminSelectEntity TItem="TItem" @bind-Value="@Value" GetText="GetText" Where="Where" />
+
+@code {
+    /// <summary>
+    /// Where条件
+    /// </summary>
+    [Parameter]
+    public Expression<Func<TItem, bool>>? Where { get; set; }
+
+    /// <summary>
+    /// SelectedItem获取Text委托
+    /// </summary>
+    [Parameter]
+    public Func<TItem, string> GetText { get; set; } = default!;
+
+    private long? Value{ get; set; }
+
+    /// <summary>
+    /// OnInitialized 方法
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        //if (TableFilter != null) TableFilter.ShowMoreButton = false;
+    }
+
+    /// <summary>
+    /// 重置过滤条件方法
+    /// </summary>
+    public override void Reset()
+    {
+        Value = null;
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// 生成过滤条件方法
+    /// </summary>
+    /// <returns></returns>
+    public override FilterKeyValueAction GetFilterConditions()
+    {
+        var filter = new FilterKeyValueAction();
+        if (Value != null)
+        {
+            filter.Filters.Add(new FilterKeyValueAction()
+            {
+                FieldKey = FieldKey,
+                FieldValue = Value.Value,
+                FilterAction = FilterAction.Equal
+            });
+        }
+        return filter;
+    }
+}

@@ -1,0 +1,293 @@
+﻿@namespace BootstrapBlazor.Components
+@using System.Linq.Expressions
+@using System.Reflection
+@using DemoAdminBlazor
+@using DemoAdminBlazor.Components
+@using DemoAdminBlazor.Components.Layout
+@using DemoAdminBlazor.Infrastructure
+@using MiniExcelLibs
+@inherits Table<TItem>
+@attribute [CascadingTypeParameter(nameof(TItem))]
+@typeparam TItem where TItem : class, IEntity<TKey>, new()
+@typeparam TKey
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    [Inject] IAggregateRootRepository<TItem> _repo { get; set; }
+    [Inject] ITableExport TableExport { get; set; }
+
+    /// <summary>
+    /// 树型ParentId委托
+    /// </summary>
+    [Parameter]
+    public Func<TItem, TKey>? GetParentId { get; set; }
+
+    /// <summary>
+    /// 查询前要执行的操作
+    /// </summary>
+    [Parameter] public EventCallback<AdminQueryEventArgs<TItem>> OnBeforeQuery { get; set; }
+
+    /// <summary>
+    /// 保存前要执行的操作
+    /// </summary>
+    [Parameter]
+    public EventCallback<AdminSaveEventArgs<TItem>> OnBeforeSaveAsync { get; set; }
+
+    /// <summary>
+    /// 保存后要执行的操作
+    /// </summary>
+    [Parameter]
+    public EventCallback<AdminSaveEventArgs<TItem>> OnFinishSaveAsync { get; set; }
+
+    /// <summary>
+    /// 删除前要执行的操作
+    /// </summary>
+    [Parameter]
+    public EventCallback<AdminRemoveEventArgs<TItem>> OnBeforeDeleteAsync { get; set; }
+
+    /// <summary>
+    /// 删除后要执行的操作
+    /// </summary>
+    [Parameter]
+    public EventCallback<AdminRemoveEventArgs<TItem>> OnFinishDeleteAsync { get; set; }
+
+    /// <summary>
+    /// 导入前要执行的操作
+    /// </summary>
+    [Parameter]
+    public EventCallback<AdminImportEventArgs<TItem>> OnBeforeImportAsync { get; set; }
+
+    /// <summary>
+    /// 忽略查询的属性名（英文逗号分隔）
+    /// </summary>
+    [Parameter]
+    public Expression<Func<TItem, object>>? IgnoreSearchColumns { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (ShowAddButton)
+        {
+            ShowAddButton = await admin.AuthButton("add");
+        }
+        if (ShowEditButton)
+        {
+            ShowEditButton = await admin.AuthButton("edit");
+        }
+        if (ShowDeleteButton)
+        {
+            ShowDeleteButton = await admin.AuthButton("remove");
+        }
+        if (ShowExtendEditButton)
+        {
+            ShowExtendEditButton = await admin.AuthButton("edit");
+        }
+        if (ShowExtendDeleteButton)
+        {
+            ShowExtendDeleteButton = await admin.AuthButton("remove");
+        }
+        if (OnExportAsync == null)
+        {
+            OnExportAsync = OnExportAllAsync;
+        }
+        if (OnQueryAsync == null && Items == null)
+        {
+            OnQueryAsync = OnQueryDataAsync;
+        }
+        if (OnSaveAsync == null)
+        {
+            OnSaveAsync = OnSaveDataAsync;
+        }
+        if (OnDeleteAsync == null)
+        {
+            OnDeleteAsync = OnDeleteDataAsync;
+        }
+        if (IsTree)
+        {
+            TreeNodeConverter = (IEnumerable<TItem> items) =>
+            {
+                return TableTreeNodeConverter(items, GetParentId);
+            };
+        }
+        IsStriped = true;
+        IsBordered = true;
+        ShowSkeleton = false;
+        ShowToolbar = true;
+        ShowEmpty = true;
+        ShowLoading = false;
+        FixedExtendButtonsColumn = true;
+        AllowDragColumn = true;
+        ClientTableName = typeof(TItem).Name;
+        SearchDialogIsDraggable = true;
+        SearchDialogSize = Size.Large;
+        ShowColumnList = true;
+        EmptyImage = EmptyImage ?? "/images/empty.svg";
+        PageItemsSource = new int[] { 20, 40, 80, 100 };
+
+        ModulePath = "/_content/BootstrapBlazor/Components/Table/Table.razor.js";
+
+        this.GetIgnoredPropertyNames();
+
+        await base.OnParametersSetAsync();
+    }
+
+    /// <summary>
+    /// 获取查询
+    /// </summary>
+    /// <returns></returns>
+    public ISelect<TItem> GetSelect()
+    {
+        return _repo.Select;
+    }
+
+    /// <summary>
+    /// 获取导出列
+    /// </summary>
+    /// <returns></returns>
+    public new IEnumerable<ITableColumn> GetExportColumns()
+    {
+        var columns = Utility.GetTableColumns<TItem>();
+
+        return columns.Where(i => i.IgnoreWhenExport is not true);
+    }
+
+    private List<string> _IgnoreSearchColumns { get; set; } = new List<string>();
+
+    /// <summary>
+    /// 要忽略的查询列
+    /// </summary>
+    /// <returns></returns>
+    private void GetIgnoredPropertyNames()
+    {
+        if (IgnoreSearchColumns != null && _IgnoreSearchColumns.Count == 0)
+        {
+            IgnoreSearchColumns.ExtractPropertyNames(_IgnoreSearchColumns);
+        }
+    }
+
+    /// <summary>
+    /// 异步执行数据导出操作
+    /// </summary>
+    /// <param name="context">表格导出上下文，包含导出相关的查询选项和列信息，泛型类型为 <see cref="TItem"/></param>
+    /// <returns>表示异步操作的任务</returns>
+    private async Task<bool> OnExportAllAsync(ITableExportDataContext<TItem> context)
+    {
+        var select = GetSelect();
+        if (OnBeforeQuery.HasDelegate)
+        {
+            await OnBeforeQuery.InvokeAsync(new AdminQueryEventArgs<TItem>(select, context.Options));
+        }
+
+        var data = await select
+                        .WhereDynamicFilter(context.Options.ToDynamicFilter(_IgnoreSearchColumns.ToArray()))
+                        .ApplyOrder<TItem,TKey>(context.Options)
+                        .ToListAsync();
+
+        return await TableExport.ExportExcelAsync(data, GetExportColumns(), $"{typeof(TItem).Name}_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+    }
+
+    /// <summary>
+    /// 异步查询数据，并按分页选项返回结果。
+    /// </summary>
+    /// <param name="options">查询分页选项，包含过滤、排序和分页信息。</param>
+    /// <returns>包含查询到的列表和总记录数的 <see cref="QueryData{SysLog}"/> 对象。</returns>
+    private async Task<QueryData<TItem>> OnQueryDataAsync(QueryPageOptions options)
+    {
+        var select = GetSelect();
+        if (OnBeforeQuery.HasDelegate)
+        {
+            await OnBeforeQuery.InvokeAsync(new AdminQueryEventArgs<TItem>(select, options));
+        }
+
+        return await select.GetPagedAsync<TItem,TKey>(options, _IgnoreSearchColumns.ToArray());
+    }
+
+    /// <summary>
+    /// 重新加载数据
+    /// </summary>
+    public async Task Reload()
+    {
+        await this.QueryAsync(1);
+    }
+
+    /// <summary>
+    /// 显示编辑框
+    /// </summary>
+    /// <param name="TItem"></param>
+    /// <returns></returns>
+    public async Task ShowFormDialog(TItem? model, ItemChangedType changedType = ItemChangedType.Add)
+    {
+        this.EditModel = model;
+        await ShowEditDialog(changedType);
+    }
+
+    /// <summary>
+    /// 异步保存。
+    /// </summary>
+    /// <param name="item">要保存的对象。</param>
+    /// <param name="changedType">变更类型。</param>
+    /// <returns>操作成功返回 <c>true</c>。</returns>
+    private async Task<bool> OnSaveDataAsync(TItem item, ItemChangedType changedType)
+    {
+        if (OnBeforeSaveAsync.HasDelegate)
+        {
+            var args = new AdminSaveEventArgs<TItem> { Item = item, ChangedType=changedType };
+            await OnBeforeSaveAsync.InvokeAsync(args);
+            if (args.Cancel) return false;
+        }
+
+        if (changedType == ItemChangedType.Update)
+            await _repo.UpdateAsync(item);
+        else
+            await _repo.InsertAsync(item);
+
+
+        if (OnFinishSaveAsync.HasDelegate)
+        {
+            var args = new AdminSaveEventArgs<TItem> { Item = item, ChangedType = changedType };
+            await OnFinishSaveAsync.InvokeAsync(args);
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 异步删除选中的记录。
+    /// </summary>
+    /// <param name="rows">要删除的记录集合。</param>
+    /// <returns>操作成功返回 <c>true</c>。</returns>
+    private async Task<bool> OnDeleteDataAsync(IEnumerable<TItem> rows)
+    {
+        if(OnBeforeDeleteAsync.HasDelegate)
+        {
+            var args = new AdminRemoveEventArgs<TItem> { Items = rows.ToList() };
+            await OnBeforeDeleteAsync.InvokeAsync(args);
+            if (args.Cancel) return false;
+        }
+
+        await _repo.DeleteAsync(rows);
+
+        if (OnFinishDeleteAsync.HasDelegate)
+        {
+            var args = new AdminRemoveEventArgs<TItem> { Items = rows.ToList() };
+            await OnFinishDeleteAsync.InvokeAsync(args);
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 将菜单数据集合转换为表格所需的树形节点集合。
+    /// </summary>
+    /// <param name="items">待转换的菜单数据集合。</param>
+    /// <returns>包含转换后的树形节点集合的任务。</returns>
+    private static Task<IEnumerable<TableTreeNode<TItem>>> TableTreeNodeConverter(IEnumerable<TItem> items, Func<TItem, TKey>? getParentId)
+    {
+        // 构造树状数据结构
+        var rootId = (TKey)Convert.ChangeType(0, typeof(TKey));
+        var ret = items.BuildTreeNodes<TItem, TKey>(rootId, getParentId);
+        return Task.FromResult(ret);
+    }
+}

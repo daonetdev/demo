@@ -1,0 +1,19 @@
+﻿@page "/Admin/ErrorLog"
+
+<AdminTable TItem="SysErrorLog" TKey="long" IsPagination ShowAdvancedSearch ShowSearch ShowExportButton
+            ShowAddButton="false" ShowEditButton="false" ShowDeleteButton="false">
+    <TableColumns>
+        <TableColumn @bind-Field="context.LogTime" Width="160" Text="日志时间" Filterable="true" Sortable="true" />
+        <TableColumn @bind-Field="context.Type" Text="日志类型" Width="160" Filterable="true" Searchable="true">
+            <Template Context="v">
+                <div class="@(v.Value == SysErrorLog.LogType.Error ? "text-danger" : "")">@v.Value</div>
+            </Template>
+        </TableColumn>
+        <TableColumn @bind-Field="context.Ip" Text="终端地址" Width="160" Filterable="true" Searchable="true" />
+        <TableColumn @bind-Field="context.Message"  Text="日志消息" Filterable="true" Searchable="true" />
+       
+    </TableColumns>
+</AdminTable>
+@code {
+
+}

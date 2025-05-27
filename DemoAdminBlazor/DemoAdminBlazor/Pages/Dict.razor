@@ -1,0 +1,104 @@
+﻿@page "/Admin/Dict"
+
+<Split Basis="45%" ShowBarHandle="false" IsCollapsible>
+    <FirstPaneTemplate>
+        <AdminTable @ref="dictTable" TItem="SysDict" TKey="long" EditDialogSize="Size.Large" ShowExtendButtons ShowExportButton
+                    OnBeforeQuery="OnBeforeQuery" OnExportAsync="OnExportAsync" OnClickRowCallback="OnClickRowCallback" style="margin-right:15px;">
+            <TableColumns>
+                <TableColumn @bind-Field="context.Name" />
+                <TableColumn @bind-Field="context.Value" Visible="false" />
+                <TableColumn @bind-Field="context.Description" />
+            </TableColumns>
+        </AdminTable>
+    </FirstPaneTemplate>
+    <SecondPaneTemplate>
+        @if (selectedCategory != null)
+        {
+            <AdminTable TItem="SysDict" TKey="long" Items="dictItems" EditDialogSize="Size.Large" ShowExtendButtons IsMultipleSelect ShowRefresh="false"
+                        OnBeforeSaveAsync="OnBeforeSaveAsync" OnFinishSaveAsync="OnFinishSaveAsync" OnFinishDeleteAsync="OnFinishDeleteAsync">
+                <TableColumns>
+                    <TableColumn @bind-Field="context.Name" />
+                    <TableColumn @bind-Field="context.Value" />
+                    <TableColumn @bind-Field="context.Description" Rows="3" />
+                </TableColumns>
+            </AdminTable>
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">
+                请选择一个字典分类查看字典项。
+            </div>
+        }
+    </SecondPaneTemplate>
+</Split>
+
+@code {
+    [Inject] IAggregateRootRepository<SysDict> _repo { get; set; }
+    [Inject] ITableExport TableExport { get; set; }
+
+    private SysDict selectedCategory;
+    private AdminTable<SysDict,long> dictTable;
+    private List<SysDict> dictItems { get; set; } = [];
+
+    /// <summary>
+    /// 在查询前过滤条件，只查询父ID为0的字典分类
+    /// </summary>
+    private void OnBeforeQuery(AdminQueryEventArgs<SysDict> e) => e.Select.Where(x => x.ParentId == 0);
+
+    /// <summary>
+    /// 在保存字典项前设置父ID
+    /// </summary>
+    /// <param name="e">保存事件参数</param>
+    private Task OnBeforeSaveAsync(AdminSaveEventArgs<SysDict> e) {
+        if(e.ChangedType == ItemChangedType.Add) e.Item.ParentId = selectedCategory.Id;
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// 点击左侧表格行，设置当前选中分类并刷新UI
+    /// </summary>
+    /// <param name="row">点击的字典分类行</param>
+    private async Task OnClickRowCallback(SysDict row) {
+        selectedCategory = row;
+        dictItems = await _repo.Select
+                .Where(x => x.ParentId == row.Id)
+                .OrderBy(a => a.Id)
+                .ToListAsync();
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// 字典项保存成功后刷新数据
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    private async Task OnFinishSaveAsync(AdminSaveEventArgs<SysDict> e)
+    {
+        await OnClickRowCallback(selectedCategory);
+    }
+
+    /// <summary>
+    /// 字典项删除成功后刷新数据
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    private async Task OnFinishDeleteAsync(AdminRemoveEventArgs<SysDict> args)
+    {
+        await OnClickRowCallback(selectedCategory);
+    }
+
+    /// <summary>
+    /// 自定义导出
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    private async Task<bool> OnExportAsync(ITableExportDataContext<SysDict> context)
+    {
+        var d= dictTable.GetExportColumns();
+        var data = await dictTable.GetSelect().ToListAsync(x => new { x.Name, x.Description, x.Value });
+        return await TableExport.ExportExcelAsync(data, dictTable.Columns, $"{typeof(SysDict).Name}_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+    }
+
+    
+}

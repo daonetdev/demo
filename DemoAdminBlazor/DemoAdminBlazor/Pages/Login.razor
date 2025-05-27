@@ -1,0 +1,163 @@
+﻿@page "/Admin/Login"
+@using System.Collections.Concurrent
+@using System.Web
+@using DemoAdminBlazor
+@using DemoAdminBlazor.Components
+@using DemoAdminBlazor.Components.Layout
+@using DemoAdminBlazor.Infrastructure
+@using DemoAdminBlazor.Infrastructure.Encrypt
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Http
+@layout LayoutEmpty
+
+<PageTitle>系统登录 - DemoAdminBlazor</PageTitle>
+
+<div class="signin text-center">
+    <main class="form-signin w-100 m-auto">
+        <form>
+            <img class="mb-4" src="/favicon.png" alt="" width="72" height="57">
+            <h1 class="h3 mb-3 fw-normal">请登录</h1>
+
+            <FloatingLabel DisplayText="用户名" maxlength="30" @bind-Value="username" />
+            <FloatingLabel DisplayText="密码" type="password" maxlength="30" @bind-Value="password" OnEnterAsync="val => Submit()" />
+            <div class="checkbox mb-3 mt-3">
+                <label>
+                    <input type="checkbox" @bind="remember"> 记住本次登录
+                </label>
+            </div>
+            <Button class="w-100 btn btn-lg btn-primary" type="button" OnClick="Submit" IsAsync>登录</Button>
+            <p class="mt-5 mb-3 text-muted">&copy; 2025</p>
+        </form>
+        <Modal @ref="captchaModal" IsKeyboard="true">
+            <ModalDialog ShowHeader="false" ShowFooter="false" Class="captcha-dialog">
+                <BodyTemplate>
+                    <Captcha @ref="loginCaptcha" Max="9" OnValidAsync="@OnValidAsync" />
+                </BodyTemplate>
+            </ModalDialog>
+        </Modal>
+    </main>
+</div>
+
+@code {
+    [Inject] IFreeSql fsql { get; set; }
+    [Inject] WebClientService webClientService { get; set; }
+    [NotNull]
+    private Modal? captchaModal { get; set; }
+    [NotNull]
+    private Captcha? loginCaptcha { get; set; }
+    // 用户名
+    string username, password, ip;
+    // 是否记住登录状态
+    bool remember = true;
+    // 存储每个 IP 的登录失败次数
+    static ConcurrentDictionary<string, int> limit = new();
+
+    /// <summary>
+    /// 验证码验证成功后的回调方法
+    /// </summary>
+    /// <param name="ret">验证结果，true 表示验证成功</param>
+    private async Task OnValidAsync(bool ret)
+    {
+        if (ret) await SignIn();
+    }
+
+    /// <summary>
+    /// 处理登录提交操作，验证用户输入，限制登录频率，记录登录日志，并根据结果进行相应提示或跳转。
+    /// </summary>
+    async Task Submit()
+    {
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+        {
+            await SwalService.Warning("登陆失败！", "用户名或密码不能为空");
+            return;
+        }
+
+        if (limit.TryGetValue(ip, out var errorCount) && errorCount >= 1)
+        {
+            await captchaModal.Show();
+            return;
+        }
+
+        await SignIn();
+    }
+
+    /// <summary>
+    /// 执行登录操作，查询用户信息，记录登录日志，根据结果进行提示或跳转
+    /// </summary>
+    async Task SignIn()
+    {
+        var clientInfo = await webClientService.GetClientInfo();
+        ip = clientInfo?.Ip ?? "::1";
+
+        var log = new SysLoginLog
+        {
+            LoginTime = DateTime.Now,
+            Username = username,
+            Browser = clientInfo.Browser,
+            City = clientInfo.City,
+            Device = clientInfo.Device,
+            Engine = clientInfo.Engine,
+            Ip = ip,
+            Language = clientInfo.Language,
+            OS = clientInfo.OS,
+            UserAgent = clientInfo.UserAgent
+        };
+
+
+        var logE = new SysErrorLog
+        {
+            LogTime = DateTime.Now,
+            Ip = ip,
+            Type = SysErrorLog.LogType.Info,
+            Message="OK"
+        };
+
+        var user = await fsql.Select<SysUser>().Where(a => a.Username == username).FirstAsync();
+        string spwd = user.Password;
+
+        string sokpwd = PBKDF2Encrypt.HashPassword("admin");
+
+        if (user is null || !PBKDF2Encrypt.VerifyPassword(password, user.Password))
+        {
+            // 先获取当前 IP 对应的失败次数，如果不存在则初始化为 0
+            limit.TryGetValue(ip, out var count);
+            // 更新字典中的值
+            limit[ip] = Interlocked.Increment(ref count);
+            logE.Message = "用户名或密码不正确";
+            logE.Type = SysErrorLog.LogType.Error;
+            
+            await fsql.Insert(logE).ExecuteAffrowsAsync();
+
+            log.Type = SysLoginLog.LoginType.登陆失败;
+            await fsql.Insert(log).ExecuteAffrowsAsync();
+            await SwalService.Error("登陆失败！", "用户名或密码不正确");
+            await loginCaptcha.Reset();
+            await captchaModal.Close();
+            return;
+        }
+
+        if (user.IsEnabled == false)
+        {
+            await SwalService.Error("登陆失败！", "帐号为禁用状态，不允许登录。");
+            return;
+        }
+
+        await admin.SignIn(user, remember);
+        log.Type = SysLoginLog.LoginType.登陆成功;
+        await fsql.Insert(log).ExecuteAffrowsAsync();
+        await fsql.Insert(logE).ExecuteAffrowsAsync();
+        // 登录成功后清除该IP的失败记录
+        limit.TryRemove(ip, out _);
+
+        var redirect = nav.GetQueryStringValue("Redirect") ?? "/Admin/";
+        admin.Redirect(redirect);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var clientInfo = await webClientService.GetClientInfo();
+        ip = clientInfo?.Ip ?? "::1";
+    }
+}

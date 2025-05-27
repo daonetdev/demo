@@ -1,0 +1,37 @@
+@page "/Blog/Article"
+<AdminTable TItem="Article" TKey="long" OnBeforeQuery="OnBeforeQuery" EditDialogSize="Size.ExtraLarge" ShowImportButton ShowExportButton ShowExtendButtons IsPagination ShowSearch ShowAdvancedSearch="false" IsMultipleSelect>
+    <TableColumns>
+        <TableColumn @bind-Field="context.ClassifyId"  Text="随笔专栏" Filterable="true">
+            <Template Context="v">@v.Row.Classify?.ClassifyName</Template>
+            <FilterTemplate>
+                <FilterProvider>
+                    <AdminSelectEntityFilter TItem="Classify" GetText="x => x.ClassifyName" />
+                </FilterProvider>
+            </FilterTemplate>
+        </TableColumn>
+        <TableColumn @bind-Field="context.ChannelId"  Text="技术频道" Filterable="true">
+            <Template Context="v">@v.Row.Channel?.ChannelName</Template>
+            <FilterTemplate>
+                <FilterProvider>
+                    <AdminSelectEntityFilter TItem="Channel" GetText="x => x.ChannelName" />
+                </FilterProvider>
+            </FilterTemplate>
+        </TableColumn>
+        <TableColumn @bind-Field="context.Title"  Text="标题" Filterable="true" Searchable="true" />
+        <TableColumn @bind-Field="context.ViewHits"  Text="浏览量" Filterable="true" />
+        <TableColumn @bind-Field="context.CommentQuantity"  Text="评论数量" Filterable="true" />
+        <TableColumn @bind-Field="context.LikesQuantity"  Text="点赞数量" Filterable="true" />
+        <TableColumn @bind-Field="context.CollectQuantity"  Text="收藏数量" Filterable="true" />
+        <TableColumn @bind-Field="context.CreatedTime"  Text="创建时间" Filterable="true" />
+    </TableColumns>
+    <EditTemplate>
+        <ArticleEditTemplate Model="context" />
+    </EditTemplate>
+</AdminTable>
+
+@code {
+    private void OnBeforeQuery(AdminQueryEventArgs<Article> e)
+    {
+        e.Select.Include(a => a.Classify).Include(a => a.Channel).IncludeMany(x => x.Tags);
+    }
+}

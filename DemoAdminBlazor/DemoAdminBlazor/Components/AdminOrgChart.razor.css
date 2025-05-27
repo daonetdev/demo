@@ -1,0 +1,100 @@
+﻿.org-chart {min-width:800px;}
+.org-chart ul {
+    padding-top: 20px;
+    position: relative;
+    transition: all .5s;
+    /* 清除浮动 */
+    overflow: auto;
+}
+
+    .org-chart ul::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+.org-chart li {
+    float: left;
+    text-align: center;
+    list-style-type: none;
+    position: relative;
+    padding: 20px 5px 0;
+    transition: all .5s;
+}
+
+    .org-chart li::after,
+    .org-chart li::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 50%;
+        border-top: 1px solid #ccc;
+        width: 50%;
+        height: 20px;
+    }
+
+    .org-chart li::after {
+        right: auto;
+        left: 50%;
+        border-left: 1px solid #ccc;
+    }
+
+    .org-chart li:only-child::after,
+    .org-chart li:only-child::before {
+        display: none;
+    }
+
+    .org-chart li:only-child {
+        padding-top: 0;
+    }
+
+    .org-chart li:first-child::before,
+    .org-chart li:last-child::after {
+        border: 0 none;
+    }
+
+    .org-chart li:last-child::before {
+        border-right: 1px solid #ccc;
+        border-radius: 0 5px 0 0;
+    }
+
+    .org-chart li:first-child::after {
+        /* 修正圆角属性值 */
+        border-radius: 5px 0 0 0;
+    }
+
+.org-chart ul ul::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 1px solid #ccc;
+    width: 0;
+    height: 20px;
+}
+
+.org-chart li div {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #666;
+    font-family: arial, verdana, tahoma;
+    font-size: 14px;
+    display: inline-block;
+    border-radius: 5px;
+    transition: all .5s;
+}
+
+    .org-chart li div:hover,
+    .org-chart li div:hover + ul li div {
+        background: #c8e4f8;
+        color: #000;
+        border: 1px solid #94a0b4;
+    }
+
+        .org-chart li div:hover + ul li::after,
+        .org-chart li div:hover + ul li::before,
+        .org-chart li div:hover + ul ul::before,
+        .org-chart li div:hover + ul::before {
+            border-color: #94a0b4;
+        }

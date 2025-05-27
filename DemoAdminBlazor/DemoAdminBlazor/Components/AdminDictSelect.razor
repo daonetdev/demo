@@ -1,0 +1,35 @@
+﻿@typeparam TType
+@inherits Select<TType>
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    /// <summary>
+    /// 上级编码
+    /// </summary>
+    [Parameter]
+    [EditorRequired]
+    public string ParentName { get; set; }
+
+    [Inject]
+    private IFreeSql fsql { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ModulePath = "/_content/BootstrapBlazor/Components/Select/Select.razor.js";
+
+        if(Items == null)
+        {
+            var items = await fsql.Select<SysDict>()
+               .Where(x => x.Parent.Name == ParentName)
+               .OrderBy(x => x.Sort)
+               .ToListAsync();
+
+            Items = items.Where(x => x.ParentId != 0).Select(x => new SelectedItem(x.Name, x.Value)).ToList();
+        }
+
+        await base.OnInitializedAsync();
+    }
+}

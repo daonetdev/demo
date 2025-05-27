@@ -1,0 +1,125 @@
+﻿@inject IAggregateRootRepository<SysMenu> _repoMenu
+@inherits ValidateBase<string>
+
+<Checkbox TValue="bool" ShowAfterLabel="true" DisplayText="全选/反选" OnStateChanged="OnStateChanged" />
+<Divider />
+<div class="menu-tree">
+    <TreeView @ref="menuTreeView" Items="TreeViewItems" IsDisabled="IsTreeDisabled" AutoCheckChildren AutoCheckParent ShowCheckbox OnTreeItemChecked="OnTreeCheckedStateChanged" @attributes="@AdditionalAttributes"></TreeView>
+</div>
+@code {
+    [Parameter]
+    public bool IsTreeDisabled { get; set; }
+
+    [Parameter]
+    public EventCallback<List<SysMenu>> OnMenuSelectionChanged { get; set; }
+
+    [Parameter]
+    public System.Linq.Expressions.Expression<Func<SysMenu, bool>>? Where { get; set; }
+
+    private List<TreeViewItem<long>> TreeViewItems { get; set; } = new();
+    private TreeView<long>? menuTreeView { get; set; }
+
+    /// <summary>
+    /// 组件初始化时异步执行的方法，用于加载菜单数据并构建 TreeView 所需的菜单项列表
+    /// </summary>
+    /// <returns>表示异步操作的任务</returns>
+    async protected override Task OnInitializedAsync()
+    {
+        var menus = await _repoMenu.Select.WhereIf(Where != null, Where).ToListAsync();
+        TreeViewItems = menus.BuildTreeViews<SysMenu, long>(0, r => CommonLocalizer[r.Label]);
+    }
+
+    /// <summary>
+    /// 全选/反选复选框状态改变时触发的方法，根据复选框状态进行全选或反选操作
+    /// </summary>
+    /// <param name="state">复选框的状态</param>
+    /// <param name="value">复选框的值，true 表示选中，false 表示未选中</param>
+    /// <returns>表示异步操作的任务</returns>
+    private async Task OnStateChanged(CheckboxState state, bool value)
+    {
+        if (value)
+        {
+            SetAllCheckedState(true);
+        }
+        else
+        {
+            InvertAllCheckedState();
+        }
+
+        await NotifyMenuSelectionChanged();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// TreeView 节点选中状态改变时触发的方法
+    /// </summary>
+    /// <returns>表示异步操作的任务</returns>
+    private async Task OnTreeCheckedStateChanged(List<TreeViewItem<long>> items)
+    {
+        await NotifyMenuSelectionChanged();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// 设置所有菜单项选中状态的方法
+    /// </summary>
+    /// <param name="isChecked">是否选中，true 表示全选，false 表示全不选</param>
+    private void SetAllCheckedState(bool isChecked)
+    {
+        TraverseTreeItems(TreeViewItems, item => item.CheckedState = isChecked ? CheckboxState.Checked : CheckboxState.UnChecked);
+        TreeViewItems = new List<TreeViewItem<long>>(TreeViewItems);
+    }
+
+    /// <summary>
+    /// 反选所有菜单项选中状态的方法
+    /// </summary>
+    private void InvertAllCheckedState()
+    {
+        TraverseTreeItems(TreeViewItems, item =>
+        {
+            item.CheckedState = item.CheckedState == CheckboxState.Checked ? CheckboxState.UnChecked : CheckboxState.Checked;
+        });
+        TreeViewItems = new List<TreeViewItem<long>>(TreeViewItems);
+    }
+
+    /// <summary>
+    /// 递归遍历 TreeView 菜单项并执行指定操作的方法
+    /// </summary>
+    /// <param name="items">要遍历的菜单项列表</param>
+    /// <param name="action">要执行的操作</param>
+    private void TraverseTreeItems(List<TreeViewItem<long>> items, Action<TreeViewItem<long>> action)
+    {
+        foreach (var item in items)
+        {
+            action(item);
+            if (item.Items != null && item.Items.Count > 0)
+            {
+                TraverseTreeItems(item.Items, action);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 通知父组件菜单选择发生变化
+    /// </summary>
+    /// <returns></returns>
+    private async Task NotifyMenuSelectionChanged()
+    {
+        var selectedMenus = menuTreeView.GetCheckedItems().Select(x => new SysMenu { Id = x.Value }).ToList();
+        await OnMenuSelectionChanged.InvokeAsync(selectedMenus);
+    }
+
+    /// <summary>
+    /// 根据菜单 ID 更新 TreeView 选中状态
+    /// </summary>
+    /// <param name="menuIds"></param>
+    public void UpdateTreeSelection(List<long> menuIds)
+    {
+        TraverseTreeItems(TreeViewItems, item =>
+        {
+            item.CheckedState = menuIds.Contains(item.Value) ? CheckboxState.Checked : CheckboxState.UnChecked;
+        });
+        TreeViewItems = new List<TreeViewItem<long>>(TreeViewItems);
+        InvokeAsync(StateHasChanged);
+    }
+}

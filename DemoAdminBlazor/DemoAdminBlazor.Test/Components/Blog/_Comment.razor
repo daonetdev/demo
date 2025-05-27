@@ -1,0 +1,33 @@
+@page "/Blog/Comment"
+<AdminTable TItem="Comment" TKey="long" OnBeforeQuery="OnBeforeQuery" EditDialogSize="Size.Large" ShowImportButton ShowExportButton ShowExtendButtons IsPagination ShowSearch IsMultipleSelect>
+    <TableColumns>
+        <TableColumn @bind-Field="context.ArticleId"  Text="关联随笔" Filterable="true">
+            <Template Context="v">@v.Row.Article?.Title</Template>
+            <FilterTemplate>
+                <FilterProvider>
+                    <AdminSelectEntityFilter TItem="Article" GetText="x => x.Title" />
+                </FilterProvider>
+            </FilterTemplate>
+            <EditTemplate Context="v">
+                <div class="col-12">
+                    <AdminSelectTable TItem="Article" GetText="x => x.Title" @bind-Value="v.Article" @bind-ValueId="v.ArticleId">
+                        <TableColumns Context="sv">
+                            <TableColumn @bind-Field="sv.Title" Filterable="true" />
+                        </TableColumns>
+                    </AdminSelectTable>
+                </div>
+            </EditTemplate>
+        </TableColumn>
+        <TableColumn @bind-Field="context.Text"  Text="内容" Filterable="true" Searchable="true" />
+        <TableColumn @bind-Field="context.LikesQuantity"  Text="点赞量" Filterable="true" />
+        <TableColumn @bind-Field="context.IsAudit"  Text="已审核" Filterable="true" />
+        <TableColumn @bind-Field="context.CreatedTime"  Text="创建时间" Filterable="true" />
+    </TableColumns>
+</AdminTable>
+
+@code {
+    private void OnBeforeQuery(AdminQueryEventArgs<Comment> e)
+    {
+        e.Select.Include(a => a.Article);
+    }
+}

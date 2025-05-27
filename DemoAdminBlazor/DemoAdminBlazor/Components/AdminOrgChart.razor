@@ -1,0 +1,31 @@
+﻿@if (Items != null && Items.Count > 0)
+{
+    <div class="org-chart">
+        <ul class="org-chart-root">
+            @RenderNodes(Items)
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<TreeViewItem<long>> Items { get; set; }
+
+    private RenderFragment RenderNodes(List<TreeViewItem<long>> nodes)
+    {
+        return @<text>
+        @foreach (var node in nodes)
+        {
+                <li>
+                    <div>@node.Text</div>
+                    @if (node.Items != null && node.Items.Count > 0)
+                    {
+                        <ul>
+                            @RenderNodes(node.Items)
+                        </ul>
+                    }
+                </li>
+        }
+        </text>;
+    }
+}

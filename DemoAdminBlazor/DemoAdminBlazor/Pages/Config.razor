@@ -1,0 +1,187 @@
+﻿@page "/Admin/Config"
+<Tab>
+    <TabItem Text="系统配置">
+        <form @onsubmit="OnSaveSettings">
+            <div class="row g-3 mt-2">
+                <h5>Smtp参数</h5>
+                @foreach (var item in new[] {
+                    ("服务地址", "SmtpSettings:Server"),
+                    ("端口", "SmtpSettings:Port"),
+                    ("用户名", "SmtpSettings:Username"),
+                    ("密码", "SmtpSettings:Password"),
+                    ("发件人", "SmtpSettings:FromName"),
+                    ("发件邮箱", "SmtpSettings:FromEmail"),
+                    ("启用SSL", "SmtpSettings:EnableSsl")
+                })
+                {
+                    <div class="col-2 col-form-label">
+                        <span>@item.Item1</span>
+                    </div>
+                    <div class="col-10">
+                        <AdminDictionaryInput TValue="string" Dictionary="@Settings" Key="@item.Item2" />
+                    </div>
+                }
+                <div class="col-2 col-form-label">
+                    <span>邮件测试</span>
+                </div>
+                <div class="col-10">
+                    <BootstrapInputGroup>
+                        <BootstrapInput @bind-Value="@testEmail" PlaceHolder="收件人邮件地址" />
+                        <Button Text="发送" OnClick="OnTestEmailClick" IsAsync></Button>
+                    </BootstrapInputGroup>
+                </div>
+                <h5>阿里云短信参数</h5>
+                @foreach (var item in new[] {
+                    ("AccessKeyId", "Aliyun:Sms:AccessKeyId"),
+                    ("AccessKeySecret", "Aliyun:Sms:AccessKeySecret"),
+                    ("签名", "Aliyun:Sms:SignName")
+                })
+                {
+                    <div class="col-2 col-form-label">
+                        <span>@item.Item1</span>
+                    </div>
+                    <div class="col-10">
+                        <AdminDictionaryInput TValue="string" Dictionary="@Settings" Key="@item.Item2" />
+                    </div>
+                }
+                <div class="col-2 col-form-label">
+                    <span>短信测试</span>
+                </div>
+                <div class="col-10">
+                    <BootstrapInputGroup>
+                        <BootstrapInput @bind-Value="@testMobile" PlaceHolder="收信人手机号" />
+                        <Button Text="发送" OnClick="OnTestSmsClick" IsAsync></Button>
+                    </BootstrapInputGroup>
+                </div>
+                <div class="col-2 col-form-label">
+                    <span></span>
+                </div>
+                <div class="col-10">
+                    <Button ButtonType="ButtonType.Submit" Icon="fa-solid fa-floppy-disk" Text="保存"></Button>
+                </div>
+                
+            </div>
+        </form>
+    </TabItem>
+    <TabItem Text="自定义">
+        <AdminTable TItem="SysConfig" TKey="long" ShowExportButton AutoGenerateColumns ShowExtendButtons IsMultipleSelect EditDialogSize="Size.Large"
+                    OnBeforeQuery="OnBeforeQuery" OnBeforeDeleteAsync="OnBeforeDeleteAsync" class="mt-2" style="height:auto;">
+        </AdminTable>
+    </TabItem>
+</Tab>
+
+@code {
+    [Inject] IAggregateRootRepository<SysConfig> _repo { get; set; }
+    [Inject] IConfiguration _configuration { get; set; }
+    [Inject] IEmailService _email { get; set; }
+    [Inject] ISmsService _sms { get; set; }
+    Dictionary<string,string> Settings { get; set; }
+    string testEmail{ get; set; }
+    string testMobile { get; set; }
+
+    /// <summary>
+    /// 组件初始化方法
+    /// </summary>
+    /// <remarks>
+    /// 从数据库加载所有包含冒号的配置项，并转换为字典格式存储在Settings属性中
+    /// </remarks>
+    protected override void OnInitialized() => 
+        Settings = GetConfigItems(":").ToDictionary(x => x.Code, x => x.Content);
+
+    private void OnBeforeQuery(AdminQueryEventArgs<SysConfig> e) => 
+        e.Select.Where(x => !x.Code.Contains(":"));
+
+    /// <summary>
+    /// 保存配置项到数据库
+    /// </summary>
+    /// <param name="args">事件参数</param>
+    /// <returns>异步任务</returns>
+    /// <remarks>
+    /// 1. 从Settings字典中获取所有修改的配置项
+    /// 2. 批量更新到数据库
+    /// 3. 重新加载配置
+    /// 4. 显示操作成功提示
+    /// </remarks>
+    private async Task OnSaveSettings(EventArgs args)
+    {
+        var items = GetConfigItems(":");
+        var updates = items.Select(x => new SysConfig { Id = x.Id, Code = x.Code, Content = Settings[x.Code] });
+        
+        await _repo.Orm.Update<SysConfig>()
+            .SetSource(updates)
+            .UpdateColumns(x => x.Content)
+            .ExecuteAffrowsAsync();
+            
+        (_configuration as IConfigurationRoot)?.Reload();
+        await ToastService.Success("操作成功", "配置项已成功保存。");
+    }
+    
+    /// <summary>
+    /// 获取包含指定字符串的配置项列表
+    /// </summary>
+    /// <param name="contains">需要包含的字符串</param>
+    /// <returns>配置项列表</returns>
+    private IList<SysConfig> GetConfigItems(string contains) => 
+        _repo.Select.Where(x => x.Code.Contains(contains)).ToList();
+
+    /// <summary>
+    /// 发送测试邮件
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    private async Task OnTestEmailClick(MouseEventArgs args)
+    {
+        if (Settings.Values.Any(string.IsNullOrEmpty))
+        {
+            await MessageService.Error("Smtp参数必须全部填写！");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(testEmail))
+        {
+            await MessageService.Error("请输入正确的邮件地址！");
+            return;
+        }
+
+        var result = await _email.SendEmailAsync(testEmail, "这是一封测试邮件", "这是测试内容");
+
+        await SwalService.Show(new SwalOption {  
+            Category=result ? SwalCategory.Success : SwalCategory.Error,
+            Title="测试结果",
+            Content = result ? "邮件发送成功。":"邮件发送失败，异常信息请查看【错误日志】"
+        });
+    }
+
+    /// <summary>
+    /// 发送测试短信
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    private async Task OnTestSmsClick(MouseEventArgs args)
+    {
+        if (string.IsNullOrEmpty(testMobile))
+        {
+            await MessageService.Error("请输入正确的手机号！");
+            return;
+        }
+
+        await _sms.SendSmsAsync(testMobile, "", "");
+    }
+
+    /// <summary>
+    /// 删除前检查
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    private async Task OnBeforeDeleteAsync(AdminRemoveEventArgs<SysConfig> e)
+    {
+        if (e.Items.Any(x => x.IsSystem))
+        {
+            await SwalService.Error("不能删除系统配置！");
+            e.Cancel = true;
+        }
+    }
+    
+}

@@ -1,0 +1,87 @@
+﻿<Tab IsCard>
+    <TabItem Text="随笔">
+        <div class="row form-inline g-3">
+            <div class="col-12 col-sm-6 col-md-6">
+                <AdminSelectEntity TItem="Classify" @bind-Value="Model.ClassifyId" GetText="e => e.ClassifyName" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <AdminSelectEntity TItem="Channel" @bind-Value="Model.ChannelId" GetText="e => e.ChannelName" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <BootstrapInput @bind-Value="Model.Title" type="text" maxlength="200" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <Select @bind-Value="Model.ArticleType" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <BootstrapInput @bind-Value="Model.Keywords" type="text" maxlength="400" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <AdminDictSelect @bind-Value="Model.Source" ParentName="GENDER" />
+            </div>
+            <div class="col-12">
+                <Textarea @bind-Value="Model.Excerpt" maxlength="500"></Textarea>
+            </div>
+            <div class="col-12">
+                <BootstrapInput @bind-Value="Model.Thumbnail" />
+            </div>
+            <div class="col-12">
+                <Textarea @bind-Value="Model.Content" />
+            </div>
+        </div>
+    </TabItem>
+    <TabItem Text="设置">
+        <div class="row form-inline g-3">
+            <div class="col-12 col-sm-6 col-md-6">
+                <BootstrapInput @bind-Value="Model.ViewHits" type="number" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <BootstrapInput @bind-Value="Model.CommentQuantity" type="number" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <BootstrapInput @bind-Value="Model.LikesQuantity" type="number" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <BootstrapInput @bind-Value="Model.CollectQuantity" type="number" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <Switch @bind-Value="Model.IsAudit" OnColor="Color.Success" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <Switch @bind-Value="Model.Recommend" OnColor="Color.Success" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <Switch @bind-Value="Model.IsStickie" OnColor="Color.Success" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <BootstrapInput @bind-Value="Model.WordNumber" type="number" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <BootstrapInput @bind-Value="Model.ReadingTime" type="number" />
+            </div>
+            <div class="col-12 col-sm-6 col-md-6">
+                <Switch @bind-Value="Model.Commentable" OnColor="Color.Success" />
+            </div>
+            <div class="col-12">
+                <AdminCheckboxListGeneric Items="@TagItems" @bind-Value="@Model.Tags" />
+            </div>
+        </div>
+    </TabItem>
+</Tab>
+
+@code {
+    [Inject] IAggregateRootRepository<Tag2> _repo { get; set; }
+
+    [Parameter]
+    [NotNull]
+    public Article? Model { get; set; }
+
+    private List<SelectedItem<Tag2>> TagItems { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        TagItems = (await _repo.Select.ToListAsync()).Select(r => new SelectedItem<Tag2>(r, r.TagName)).ToList();
+    }
+}

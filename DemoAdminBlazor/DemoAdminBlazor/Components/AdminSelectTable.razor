@@ -1,0 +1,97 @@
+﻿@inherits ValidateBase<TItem>
+@typeparam TItem where TItem : class, IEntity<long>, new()
+
+<CascadingValue Value="this" IsFixed="true">
+    @TableColumns?.Invoke(new TItem())
+</CascadingValue>
+<RenderTemplate>
+    @if (IsShowLabel)
+    {
+        <BootstrapLabel required="@Required" for="@Id" ShowLabelTooltip="ShowLabelTooltip" Value="@DisplayText" />
+    }
+    <div @attributes="@AdditionalAttributes" id="@Id" class="@ClassString" tabindex="0" hidefocus="true">
+        <SelectTable TableColumns="TableColumns" TItem="TItem" @bind-Value="Value" ShowLabel="false" IsPagination="true"
+                     OnQueryAsync="OnQueryAsync" GetTextCallback="@GetText" OnValueChanged="OnSelectedItemChangedInternal"
+                     TableMinWidth="300" IsClearable>
+            <Template>
+                @GetText(context)
+            </Template>
+        </SelectTable>
+    </div>
+</RenderTemplate>
+@code {
+    private string? ClassString => CssBuilder.Default()
+        .AddClass("form-item")
+        .AddClass(CssClass).AddClass(ValidCss)
+        .Build();
+
+    /// <summary>
+    /// 获得/设置 TableHeader 实例
+    /// </summary>
+    [Parameter]
+    public RenderFragment<TItem>? TableColumns { get; set; }
+
+    [Parameter]
+    public Func<TItem, string> GetText { get; set; } = default!;
+
+    [Inject] IAggregateRootRepository<TItem> _repo { get; set; }
+
+    // 双向绑定的 ValueId 属性
+    [Parameter]
+    public long? ValueId { get; set; }
+
+    [Parameter]
+    public EventCallback<long?> ValueIdChanged { get; set; }
+
+    private async Task<QueryData<TItem>> OnQueryAsync(QueryPageOptions options)
+    {
+        return await _repo.Select.GetPagedAsync<TItem,long>(options);
+    }
+
+    private async Task OnSelectedItemChangedInternal(TItem? item)
+    {
+        Value = item;
+        long? id = item?.Id;
+
+        if (ValueChanged.HasDelegate)
+        {
+            await ValueChanged.InvokeAsync(Value);
+        }
+
+        if (ValueId != id)
+        {
+            ValueId = id;
+            if (ValueIdChanged.HasDelegate)
+            {
+                await ValueIdChanged.InvokeAsync(ValueId);
+            }
+        }
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        // 根据传入的 ValueId 值尝试找到对应的实体
+        if (ValueId.HasValue && ValueId.Value > 0)
+        {
+            // 这里需要根据实际情况实现根据 Id 查找实体的逻辑
+            Value = _repo.Where(x => x.Id == ValueId.Value).First();
+        }
+        else
+        {
+            Value = null;
+        }
+
+        // 根据 Value 更新 ValueId
+        long? currentId = Value?.Id;
+        if (ValueId != currentId)
+        {
+            ValueId = currentId;
+            if (ValueIdChanged.HasDelegate)
+            {
+                ValueIdChanged.InvokeAsync(ValueId);
+            }
+        }
+    }
+}

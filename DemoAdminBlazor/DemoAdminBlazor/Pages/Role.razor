@@ -1,0 +1,103 @@
+﻿@page "/Admin/Role"
+
+<Split Basis="45%" ShowBarHandle="false" IsCollapsible>
+    <FirstPaneTemplate>
+        <AdminTable TItem="SysRole" TKey="long" EditDialogSize="Size.Large" ShowSearch="false" IsMultipleSelect="false" ClickToSelect ShowExtendButtons
+                    OnBeforeQuery="OnBeforeQuery" OnBeforeSaveAsync="OnBeforeSaveAsync" OnBeforeDeleteAsync="OnBeforeDeleteAsync" OnClickRowCallback="OnClickRowCallback" style="margin-right:15px;">
+            <TableColumns>
+                <TableColumn @bind-Field="context.Name" />
+                <TableColumn @bind-Field="context.Description" />
+            </TableColumns>
+            <EditTemplate>
+                <RoleEditTemplate Model="context" />
+            </EditTemplate>
+        </AdminTable>
+    </FirstPaneTemplate>
+    <SecondPaneTemplate>
+        <Button Color="Color.Primary" IsDisabled="select == null || (select != null && select.IsAdministrator)" OnClick="OnSaveMenu">保存</Button>
+        <Divider />
+        <AdminMenuTree IsTreeDisabled="@(select != null && select.IsAdministrator)" OnMenuSelectionChanged="OnMenuSelectionChanged" @ref="menuSelectionTree" style="height:calc(100vh - 260px)" />
+    </SecondPaneTemplate>
+</Split>
+
+@code {
+    [Inject] IAggregateRootRepository<SysRole> _repo { get; set; }
+    [Inject] IEmailService _email { get; set; }
+
+    private SysRole? select { get; set; } = null;
+    private AdminMenuTree? menuSelectionTree { get; set; }
+
+    /// <summary>
+    /// 查询前执行
+    /// </summary>
+    /// <param name="args"></param>
+    /// <exception cref="NotImplementedException"></exception>
+    private void OnBeforeQuery(AdminQueryEventArgs<SysRole> e) => e.Select.IncludeMany(x => x.Menus);
+
+    /// <summary>
+    /// 保存前的操作
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    private async Task OnBeforeSaveAsync(AdminSaveEventArgs<SysRole> e)
+    {
+
+    }
+
+    /// <summary>
+    /// 检查要删除的数据
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    private async Task OnBeforeDeleteAsync(AdminRemoveEventArgs<SysRole> e)
+    {
+        if (e.Items.Any(x => x.IsAdministrator))
+        {
+            await SwalService.Error("超级管理员角色不允许删除");
+            e.Cancel = true;
+        }
+    }
+
+    /// <summary>
+    /// 保存角色菜单权限的异步操作方法，将 TreeView 中选中的菜单关联到当前角色并保存
+    /// </summary>
+    /// <returns>表示异步操作的任务</returns>
+    [AdminButton("alloc_menus")]
+    private async Task OnSaveMenu()
+    {
+        if (select != null)
+        {
+            await _repo.UpdateAsync(select);
+            await ToastService.Success("保存数据", "权限保存成功");
+        }
+    }
+
+    /// <summary>
+    /// 点击表格行时触发的回调方法，用于选中角色并更新 TreeView 中菜单项的选中状态
+    /// </summary>
+    /// <param name="row">被点击行对应的角色对象</param>
+    /// <returns>表示异步操作的任务</returns>
+    private async Task OnClickRowCallback(SysRole row)
+    {
+        select = row;
+        var roleMenuIds = row.Menus.Select(m => m.Id).ToList();
+        menuSelectionTree?.UpdateTreeSelection(roleMenuIds);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// 处理菜单选择变化的事件
+    /// </summary>
+    /// <param name="selectedMenus"></param>
+    /// <returns></returns>
+    private async Task OnMenuSelectionChanged(List<SysMenu> selectedMenus)
+    {
+        if (select != null)
+        {
+            select.Menus.Clear();
+            select.Menus.AddRange(selectedMenus);
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+}

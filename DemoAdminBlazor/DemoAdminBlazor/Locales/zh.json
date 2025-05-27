@@ -1,0 +1,30 @@
+﻿{
+  "DemoAdminBlazor.Common": {
+    "Import": "导入"
+  },
+  "DemoAdminBlazor.SysUser": {
+    "Username": "用户名",
+    "Nickname": "姓名",
+    "Mobile": "手机",
+    "Email": "邮箱",
+    "Password": "密码",
+    "IsEnabled": "有效",
+    "OrgId": "所属组织",
+    "Description": "备注",
+    "LoginTime": "最后登录时间",
+    "Roles": "角色",
+    "RoleIds": "角色",
+    "CreatedTime": "创建时间",
+    "CreatedUserName": "创建人",
+    "ModifiedTime": "修改时间",
+    "ModifiedUserName": "修改人"
+  },
+  "DemoAdminBlazor.Server.Data.EnumEducation": {
+    "PlaceHolder": "请选择 ...",
+    "Primary": "小学",
+    "Middle": "中学"
+  },
+  "DemoAdminBlazor.Components.CultureChooser": {
+    "Label": "语言："
+  }
+}
