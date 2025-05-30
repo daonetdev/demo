@@ -57,9 +57,9 @@
 
     private async Task OnBeforeQuery(AdminQueryEventArgs<SysOrg> e)
     {
-        e.Select.Include(x => x.ResponsibleUser);
+        // e.Select.Include(x => x.ResponsibleUser);
 
-        OrgTreeItems = (await _repo.Select.OrderBy(a => a.Sort).ToListAsync()).BuildTreeViews<SysOrg, long>(0, r => r.Label);
+        // OrgTreeItems = (await _repo.Select.OrderBy(a => a.Sort).ToListAsync()).BuildTreeViews<SysOrg, long>(0, r => r.Label);
     }
 
     private async Task ShowFormDialog(SysOrg row)
