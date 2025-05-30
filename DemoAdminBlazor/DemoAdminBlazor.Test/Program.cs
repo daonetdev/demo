@@ -17,7 +17,7 @@ builder.AddDemoAdminBlazor(new DemoAdminBlazorOptions
     Assemblies = [typeof(Program).Assembly],
     EnableLocalization = true,//启用多
     UseAutoSyncStructure = true,
-    DataType= FreeSql.DataType.MySql
+    DataType= FreeSql.DataType.Sqlite
 });
 
 // Add services to the container.
