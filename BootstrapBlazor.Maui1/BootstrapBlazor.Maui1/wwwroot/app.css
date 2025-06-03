@@ -1,5 +1,12 @@
-.status-bar-safe-area {
+﻿.status-bar-safe-area {
     display: none;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+    .scroll {
+        scrollbar-color: rgba(0,0,0,0.3) rgba(0,0,0,0);
+        scrollbar-width: thin;
+    }
 }
 
 @supports (-webkit-touch-callout: none) {
