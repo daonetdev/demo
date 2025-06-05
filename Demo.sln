@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeleteVsDevFoldersApp", "De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeleteFoldersDemo", "DeleteFoldersDemo\DeleteFoldersDemo\DeleteFoldersDemo.csproj", "{4A0D200B-D5A5-4FC9-AF9C-92C4F65914BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Component.Shared", "Blazor.Component.Shared\Blazor.Component.Shared.csproj", "{F9556E5B-5763-CB06-59B5-4EFD706FCAC3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{4A0D200B-D5A5-4FC9-AF9C-92C4F65914BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A0D200B-D5A5-4FC9-AF9C-92C4F65914BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A0D200B-D5A5-4FC9-AF9C-92C4F65914BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9556E5B-5763-CB06-59B5-4EFD706FCAC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9556E5B-5763-CB06-59B5-4EFD706FCAC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9556E5B-5763-CB06-59B5-4EFD706FCAC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9556E5B-5763-CB06-59B5-4EFD706FCAC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
