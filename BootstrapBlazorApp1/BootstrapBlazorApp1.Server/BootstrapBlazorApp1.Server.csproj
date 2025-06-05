@@ -17,11 +17,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Append.Blazor.Printing" Version="6.3.0" />
     <PackageReference Include="BootstrapBlazor" Version="9.*" />
     <PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.0.*" />
     <PackageReference Include="BootstrapBlazor.Html2Pdf" Version="9.0.*" />
     <PackageReference Include="BootstrapBlazor.TableExport" Version="9.2.*" />
     <PackageReference Include="BootstrapBlazor.UniverSheet" Version="9.0.5" />
+    <PackageReference Include="FastReport.OpenSource" Version="2025.2.0" />
+    <PackageReference Include="FastReport.OpenSource.Export.PdfSimple" Version="2025.2.0" />
     <PackageReference Include="FreeSql" Version="3.5.206" />
     <PackageReference Include="FreeSql.Provider.Sqlite" Version="3.5.206" />
   </ItemGroup>

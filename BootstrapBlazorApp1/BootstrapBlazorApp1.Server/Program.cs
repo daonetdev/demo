@@ -1,4 +1,5 @@
-﻿using BootstrapBlazorApp1.Server.Components;
+﻿using Append.Blazor.Printing;
+using BootstrapBlazorApp1.Server.Components;
 using Microsoft.AspNetCore.SignalR;
 using System.Text;
 
@@ -21,6 +22,8 @@ builder.Services.AddBootstrapBlazorHtml2PdfService();
 
 // 增加 SignalR 服务数据传输大小限制配置
 builder.Services.Configure<HubOptions>(option => option.MaximumReceiveMessageSize = null);
+
+builder.Services.AddScoped<IPrintingService, PrintingService>();
 
 var app = builder.Build();
 

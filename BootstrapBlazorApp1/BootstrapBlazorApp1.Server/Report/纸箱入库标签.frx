@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="06/23/2022 10:36:55" ReportInfo.Modified="05/24/2025 10:15:35" ReportInfo.CreatorVersion="2023.2.18.0">
+  <Dictionary>
+    <Parameter Name="CustID" DataType="System.String" AsString=""/>
+    <Parameter Name="CustShortName" DataType="System.String" AsString=""/>
+    <Parameter Name="SO" DataType="System.String" AsString=""/>
+    <Parameter Name="WO" DataType="System.String" AsString=""/>
+    <Parameter Name="BOM" DataType="System.String" AsString=""/>
+    <Parameter Name="BarCode" DataType="System.String" AsString=""/>
+    <Parameter Name="ProdQty" DataType="System.String" AsString=""/>
+    <Parameter Name="ReceiveQty" DataType="System.String" AsString=""/>
+    <Parameter Name="Location" DataType="System.String" AsString=""/>
+    <Parameter Name="LocSub" DataType="System.String" AsString=""/>
+    <Parameter Name="ReceiveFrom" DataType="System.String" AsString=""/>
+    <Parameter Name="ReceiveDate" DataType="System.String" AsString=""/>
+    <Parameter Name="ReceiveItem" DataType="System.String" AsString=""/>
+    <Parameter Name="KeyInBy" DataType="System.String" AsString=""/>
+    <Parameter Name="KeyInOn" DataType="System.String" AsString=""/>
+    <Parameter Name="ProductCategory" DataType="System.String" AsString=""/>
+    <Parameter Name="PartCode" DataType="System.String" AsString=""/>
+    <Parameter Name="Model" DataType="System.String" AsString=""/>
+    <Parameter Name="Length" DataType="System.String" AsString=""/>
+    <Parameter Name="Width" DataType="System.String" AsString=""/>
+    <Parameter Name="Height" DataType="System.String" AsString=""/>
+    <Parameter Name="CRLength" DataType="System.String" AsString=""/>
+    <Parameter Name="CRWidth" DataType="System.String" AsString=""/>
+    <Parameter Name="Flute" DataType="System.String" AsString=""/>
+    <Parameter Name="BoardQuality" DataType="System.String" AsString=""/>
+    <Parameter Name="StoreReceiveMan" DataType="System.String" AsString=""/>
+    <Parameter Name="Remark" DataType="System.String" AsString=""/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="100" PaperHeight="60" LeftMargin="1" TopMargin="1" RightMargin="1" BottomMargin="1" Watermark.Font="宋体, 60pt" LastPageSource="15" FirstPageSource="15" OtherPageSource="15">
+    <DataBand Name="Data1" Width="370.44" Height="217.35">
+      <TextObject Name="Text23" Top="179.55" Width="132.3" Height="37.8" Text="库位：" VertAlign="Center" Font="黑体, 14pt, style=Bold"/>
+      <TextObject Name="Text24" Left="130.4" Top="5.67" Width="94.5" Height="18.9" Text="纸箱入库标签" Font="宋体, 9pt"/>
+    </DataBand>
+  </ReportPage>
+</Report>
