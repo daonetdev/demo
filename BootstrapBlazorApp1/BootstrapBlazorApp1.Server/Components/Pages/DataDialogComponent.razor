@@ -1,5 +1,8 @@
-﻿<h3>DataDialogComponent</h3>
-
-@code {
-
-}
+﻿<div class="row form-inline g-3">
+    <div class="col-12 col-sm-6">
+        <BootstrapInput @bind-Value="Value.Name" ShowLabel="true" DisplayText="姓名" />
+    </div>
+    <div class="col-12 col-sm-6">
+        <BootstrapInput @bind-Value="Value.Count" ShowLabel="true" DisplayText="数量" />
+    </div>
+</div>

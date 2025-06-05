@@ -1,5 +1,21 @@
-﻿<h3>DialogPage</h3>
+﻿@page "/dialog"
+@inject DialogService DialogService
+<h1>DialogPage</h1>
 
+<Button @onclick="@OnClickShowDataById">点击打开 Dialog</Button>
 @code {
 
+
+    private async Task OnClickShowDataById()
+    {
+        var op = new DialogOption
+        {
+            Title = "Data query window",
+            ShowFooter = false,
+            BodyContext = 1,
+            Component = BootstrapDynamicComponent.CreateComponent<DataDialogComponent>()
+        };
+
+        await DialogService.Show(op);
+    }
 }
