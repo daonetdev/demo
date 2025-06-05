@@ -35,6 +35,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleMCPClient", "Console
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleMCPServer", "ConsoleMCPServer\ConsoleMCPServer.csproj", "{29073C7A-C396-4A4D-B32E-67C0B1EC9A2F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeleteVsDevFoldersApp", "DeleteFoldersDemo\DeleteFoldersApp\DeleteVsDevFoldersApp.csproj", "{D2006582-206B-4DE0-92FD-C1366A3E5383}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeleteFoldersDemo", "DeleteFoldersDemo\DeleteFoldersDemo\DeleteFoldersDemo.csproj", "{4A0D200B-D5A5-4FC9-AF9C-92C4F65914BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +85,14 @@ Global
 		{29073C7A-C396-4A4D-B32E-67C0B1EC9A2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29073C7A-C396-4A4D-B32E-67C0B1EC9A2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29073C7A-C396-4A4D-B32E-67C0B1EC9A2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2006582-206B-4DE0-92FD-C1366A3E5383}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2006582-206B-4DE0-92FD-C1366A3E5383}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2006582-206B-4DE0-92FD-C1366A3E5383}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2006582-206B-4DE0-92FD-C1366A3E5383}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A0D200B-D5A5-4FC9-AF9C-92C4F65914BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A0D200B-D5A5-4FC9-AF9C-92C4F65914BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A0D200B-D5A5-4FC9-AF9C-92C4F65914BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A0D200B-D5A5-4FC9-AF9C-92C4F65914BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
