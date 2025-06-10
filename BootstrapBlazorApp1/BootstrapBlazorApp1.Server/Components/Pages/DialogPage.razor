@@ -2,10 +2,14 @@
 @inject DialogService DialogService
 <h1>DialogPage</h1>
 
-<Button @onclick="@OnClickShowDataById">点击打开 Dialog</Button>
+<Button @onclick="@KeyboardOnClick">点击打开 Dialog1</Button>
+
+<Button @onclick="@OnClickShowDataById">点击打开 Dialog2</Button>
+
+<Button @onclick="@BodyContextOnClick">点击打开 Dialog3</Button>
 @code {
 
-
+    private bool IsKeyboard { get; set; }
     private async Task OnClickShowDataById()
     {
         var op = new DialogOption
@@ -18,4 +22,26 @@
 
         await DialogService.Show(op);
     }
+
+    private Task KeyboardOnClick() => DialogService.Show(new DialogOption()
+    {
+        IsKeyboard = IsKeyboard,
+        Title = "I am the popup created by the service",
+        BodyTemplate = BootstrapDynamicComponent.CreateComponent<Button>(new Dictionary<string, object?>
+        {
+            [nameof(Button.ChildContent)] = new RenderFragment(builder => builder.AddContent(0, "Button"))
+        }).Render()
+    });
+
+    private Task BodyContextOnClick() => DialogService.Show(new DialogOption()
+    {
+        Title = "Built-in Counter component",
+        BodyContext = "I'm a passer",
+        BodyTemplate = builder =>
+        {
+            builder.OpenComponent<DataDialogComponent>(0);
+            builder.CloseComponent();
+        }
+    });
+
 }

@@ -9,5 +9,8 @@ namespace BootstrapBlazorApp1.Server.Components.Pages
         [Parameter]
         [NotNull]
         public Foo? Value { get; set; }
+
+        [CascadingParameter(Name = "BodyContext")]
+        private object? Parameter { get; set; }
     }
 }

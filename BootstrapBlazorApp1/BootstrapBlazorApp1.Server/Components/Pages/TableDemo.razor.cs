@@ -16,6 +16,10 @@ namespace BootstrapBlazorApp1.Server.Components.Pages
         [NotNull]
         private IStringLocalizer<Foo>? Localizer { get; set; }
 
+        [Inject]
+        [NotNull]
+        private DialogService? DialogService { get; set; }
+
         private readonly ConcurrentDictionary<Foo, IEnumerable<SelectedItem>> _cache = new();
 
         private IEnumerable<SelectedItem> GetHobbies(Foo item) => _cache.GetOrAdd(item, f => Foo.GenerateHobbies(Localizer));
@@ -108,5 +112,13 @@ namespace BootstrapBlazorApp1.Server.Components.Pages
 
             return Task.FromResult(true);
         }
+
+        private Task PrintChar() => DialogService.Show(new DialogOption()
+        {
+            Title = "图表",
+            Size = Size.Large,
+            ShowPrintButton = true,
+            Component = BootstrapDynamicComponent.CreateComponent<PrintChartDialog>()
+        });
     }
 }

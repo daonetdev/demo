@@ -19,6 +19,9 @@
   <ItemGroup>
     <PackageReference Include="Append.Blazor.Printing" Version="6.3.0" />
     <PackageReference Include="BootstrapBlazor" Version="9.*" />
+    <PackageReference Include="BootstrapBlazor.Bluetooth" Version="9.0.0" />
+    <PackageReference Include="BootstrapBlazor.Chart" Version="9.0.0" />
+    <PackageReference Include="BootstrapBlazor.DockView" Version="9.1.13" />
     <PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.0.*" />
     <PackageReference Include="BootstrapBlazor.Html2Pdf" Version="9.0.*" />
     <PackageReference Include="BootstrapBlazor.TableExport" Version="9.2.*" />
