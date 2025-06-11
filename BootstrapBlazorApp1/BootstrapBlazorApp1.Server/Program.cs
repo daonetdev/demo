@@ -20,7 +20,8 @@ builder.Services.AddBootstrapBlazorTableExportService();
 // 增加 Html2Pdf 服务
 builder.Services.AddBootstrapBlazorHtml2PdfService();
 
-// 增加 SignalR 服务数据传输大小限制配置
+// 增加 SignalR 服务数据传输大小限制配置-赞-如下关闭大小限制
+
 builder.Services.Configure<HubOptions>(option => option.MaximumReceiveMessageSize = null);
 
 builder.Services.AddScoped<IPrintingService, PrintingService>();

@@ -47,6 +47,7 @@ namespace BootstrapBlazorApp1.Server.Components.Layout
                 new() { Text = "Weather", Icon = "fa-solid fa-fw fa-database", Url = "/weather" },
                 new() { Text = "Table", Icon = "fa-solid fa-fw fa-table", Url = "/table" },
                 new() { Text = "DialogPage", Icon = "fa-solid fa-fw fa-table", Url = "/dialog" },
+                new() { Text = "UplaodPage", Icon = "fa-solid fa-fw fa-table", Url = "/uploadcard" },
                 new() { Text = "UniverSheet", Icon = "fa-solid fa-fw fa-table", Url = "/onlineUniverSheet" },
                 new() { Text = "花名册", Icon = "fa-solid fa-fw fa-users", Url = "/users" }
             };

@@ -1,0 +1,61 @@
+﻿@page "/uploadcard"
+@inject IOptionsMonitor<WebsiteOptions> WebsiteOption
+<h3>UploadCardDemo</h3>
+
+<section ignore>
+    <div class="row g-3">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="IsDisabled"></BootstrapInputGroupLabel>
+                <Switch @bind-Value="@_isDisabled"></Switch>
+            </BootstrapInputGroup>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="IsMultiple"></BootstrapInputGroupLabel>
+                <Switch @bind-Value="@_isMultiple"></Switch>
+            </BootstrapInputGroup>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="IsDirectory"></BootstrapInputGroupLabel>
+                <Switch @bind-Value="@_isDirectory"></Switch>
+            </BootstrapInputGroup>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="IsUploadButtonAtFirst"></BootstrapInputGroupLabel>
+                <Switch @bind-Value="@_isUploadButtonAtFirst"></Switch>
+            </BootstrapInputGroup>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="ShowProgress"></BootstrapInputGroupLabel>
+                <Switch @bind-Value="@_showProgress"></Switch>
+            </BootstrapInputGroup>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="ShowDeleteButton"></BootstrapInputGroupLabel>
+                <Switch @bind-Value="@_showDeleteButton"></Switch>
+            </BootstrapInputGroup>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="ShowZoomButton"></BootstrapInputGroupLabel>
+                <Switch @bind-Value="@_showZoomButton"></Switch>
+            </BootstrapInputGroup>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="ShowDownloadButton"></BootstrapInputGroupLabel>
+                <Switch @bind-Value="@_showDownloadButton"></Switch>
+            </BootstrapInputGroup>
+        </div>
+    </div>
+</section>
+<CardUpload TValue="string" IsMultiple="@_isMultiple" IsDirectory="@_isDirectory"
+            IsDisabled="@_isDisabled" IsUploadButtonAtFirst="@_isUploadButtonAtFirst"
+            ShowProgress="@_showProgress" ShowDeleteButton="@_showDeleteButton"
+            ShowDownloadButton="@_showDownloadButton" ShowZoomButton="@_showZoomButton" OnChange="@OnCardUpload"></CardUpload>
+
