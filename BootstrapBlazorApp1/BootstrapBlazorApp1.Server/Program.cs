@@ -14,6 +14,8 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 builder.Services.AddBootstrapBlazor();
 
+builder.Services.AddBootstrapBlazorWinBoxService();
+
 // 增加 Pdf 导出服务
 builder.Services.AddBootstrapBlazorTableExportService();
 

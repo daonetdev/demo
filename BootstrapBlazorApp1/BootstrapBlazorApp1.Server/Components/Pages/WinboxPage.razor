@@ -1,0 +1,13 @@
+﻿@page "/win-box"
+@inject IStringLocalizer<Foo> LocalizerFoo
+@inject IOptionsMonitor<WebsiteOptions> WebsiteOption
+
+<h3>WinBox 窗口组件</h3>
+<h4>模拟 Windows 窗口风格的组件</h4>
+
+
+<Button Text="Show" OnClickWithoutRender="() => OpenWinBox(null)"></Button>
+<Button Text="Modal" OnClickWithoutRender="OpenModalWinBox"></Button>
+<ConsoleLogger @ref="_logger"></ConsoleLogger>
+
+
