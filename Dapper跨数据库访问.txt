@@ -3,3 +3,33 @@ oracle，sqlserver，sqlite，postgresql的共用类型项目（需提供完整�
 需封装为接口供其它程式调用，框架请使用.net8 ，项目注释请使用中文，
 项目之外需新增不同数据库的使用范例连接字符串需在appsettings.json中配置，
 请依据以上要求给出完整实现代码与项目结构
+
+
+DapperMultiDbSample
+│
+├── DapperMultiDb.Core/           // 数据库访问核心库
+│   ├── IDbService.cs
+│   ├── DbServiceFactory.cs
+│   ├── DbServiceBase.cs
+│   ├── MySqlService.cs
+│   ├── OracleService.cs
+│   ├── SqlServerService.cs
+│   ├── SqliteService.cs
+│   ├── PostgreSqlService.cs
+│   └── DapperMultiDb.Core.csproj
+│
+├── DapperMultiDb.Demo/           // Demo 调用项目
+│   ├── Program.cs
+│   ├── appsettings.json
+│   └── DapperMultiDb.Demo.csproj
+│
+└── DapperMultiDbSample.sln
+
+•	Dapper
+•	Microsoft.Extensions.Configuration
+•	Microsoft.Extensions.Configuration.Json
+•	MySql.Data
+•	Oracle.ManagedDataAccess
+•	Microsoft.Data.SqlClient
+•	Microsoft.Data.Sqlite
+•	Npgsql

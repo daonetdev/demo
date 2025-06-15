@@ -49,6 +49,8 @@ namespace BootstrapBlazorApp1.Server.Components.Layout
                 new() { Text = "DialogPage", Icon = "fa-solid fa-fw fa-table", Url = "/dialog" },
                 new() { Text = "UplaodPage", Icon = "fa-solid fa-fw fa-table", Url = "/uploadcard" },
                 new() { Text = "WinboxPage", Icon = "fa-solid fa-fw fa-table", Url = "/win-box" },
+                new() { Text = "MultiSelect", Icon = "fa-solid fa-fw fa-table", Url = "/multiselect" },
+                new() { Text = "SelectObject", Icon = "fa-solid fa-fw fa-table", Url = "/selectobject" },
                 new() { Text = "Upload-drop", Icon = "fa-solid fa-fw fa-table", Url = "/upload-drop" },
                 new() { Text = "UniverSheet", Icon = "fa-solid fa-fw fa-table", Url = "/onlineUniverSheet" },
                 new() { Text = "花名册", Icon = "fa-solid fa-fw fa-users", Url = "/users" }

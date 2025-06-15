@@ -1,0 +1,69 @@
+﻿@page "/selectobject"
+@inject IOptionsMonitor<WebsiteOptions> WebsiteOption
+<h3>SelectObjectDemo</h3>
+
+<DemoBlock Title="基本功能" Introduction="内置 <code>ListView</code> 组件选择图片" Name="Normal">
+    <section ignore>
+        可通过 <code>IsClearable</code> 控制是否显示清除小按钮，默认值 <code>false</code>
+    </section>
+    <SelectObject @bind-Value="_value" GetTextCallback="GetTextCallback" IsClearable="true">
+        <ListView TItem="Product" Items="@Products" OnListViewItemClick="item => OnListViewItemClick(item, context)">
+            <BodyTemplate Context="value">
+                <Card>
+                    <BodyTemplate>
+                        <img src="@value.ImageUrl" />
+                        <div class="lv-demo-desc">@value.Description</div>
+                    </BodyTemplate>
+                </Card>
+            </BodyTemplate>
+        </ListView>
+    </SelectObject>
+</DemoBlock>
+
+<DemoBlock Title="设置最小宽度" Introduction="通过设置 <code>DropdownMinWidth</code> 值，来改变下拉框最小宽度" Name="MinWidth">
+    <div class="row">
+        <div class="col-4">
+            <SelectObject @bind-Value="_widthValue" GetTextCallback="GetTextCallback" DropdownMinWidth="704">
+                <ListView TItem="Product" Items="@Products" OnListViewItemClick="item => OnListViewItemClick(item, context)">
+                    <BodyTemplate Context="value">
+                        <Card>
+                            <BodyTemplate>
+                                <img src="@value.ImageUrl" />
+                                <div class="lv-demo-desc">@value.Description</div>
+                            </BodyTemplate>
+                        </Card>
+                    </BodyTemplate>
+                </ListView>
+            </SelectObject>
+        </div>
+    </div>
+</DemoBlock>
+
+<DemoBlock Title="设置高度" Introduction="通过设置 <code>Height</code> 值，来改变下拉框高度" Name="Height">
+    <div class="row">
+        <div class="col-4">
+            <SelectObject @bind-Value="_heightValue" GetTextCallback="GetTextCallback" DropdownMinWidth="704" Height="600">
+                <ListView TItem="Product" Items="@Products" OnListViewItemClick="item => OnListViewItemClick(item, context)">
+                    <BodyTemplate Context="value">
+                        <Card>
+                            <BodyTemplate>
+                                <img src="@value.ImageUrl" />
+                                <div class="lv-demo-desc">@value.Description</div>
+                            </BodyTemplate>
+                        </Card>
+                    </BodyTemplate>
+                </ListView>
+            </SelectObject>
+        </div>
+    </div>
+</DemoBlock>
+
+<DemoBlock Title="自定义组件" Introduction="任意组件均可放入下拉框内，需要有一个回调进行赋值或者关窗即可" Name="CustomComponent">
+    <div class="row">
+        <div class="col-4">
+            <SelectObject @bind-Value="_counter" GetTextCallback="GetCounterTextCallback" Height="170">
+                <ValueCounter OnSubmitAsync="v => OnSubmit(v, context)"></ValueCounter>
+            </SelectObject>
+        </div>
+    </div>
+</DemoBlock>
