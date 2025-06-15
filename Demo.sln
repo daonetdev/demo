@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeleteFoldersDemo", "Delete
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazor.Component.Shared", "Blazor.Component.Shared\Blazor.Component.Shared.csproj", "{F9556E5B-5763-CB06-59B5-4EFD706FCAC3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BootstrapBlazor.Maui1", "BootstrapBlazor.Maui1\BootstrapBlazor.Maui1\BootstrapBlazor.Maui1\BootstrapBlazor.Maui1.csproj", "{E82D167E-834B-A3F8-3895-75731DA64808}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BootstrapBlazor.Maui1.Shared", "BootstrapBlazor.Maui1\BootstrapBlazor.Maui1\BootstrapBlazor.Maui1.Shared\BootstrapBlazor.Maui1.Shared.csproj", "{08E020AF-C888-59E9-B01F-380758B33385}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +91,14 @@ Global
 		{F9556E5B-5763-CB06-59B5-4EFD706FCAC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9556E5B-5763-CB06-59B5-4EFD706FCAC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9556E5B-5763-CB06-59B5-4EFD706FCAC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E82D167E-834B-A3F8-3895-75731DA64808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E82D167E-834B-A3F8-3895-75731DA64808}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E82D167E-834B-A3F8-3895-75731DA64808}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E82D167E-834B-A3F8-3895-75731DA64808}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08E020AF-C888-59E9-B01F-380758B33385}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08E020AF-C888-59E9-B01F-380758B33385}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08E020AF-C888-59E9-B01F-380758B33385}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08E020AF-C888-59E9-B01F-380758B33385}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

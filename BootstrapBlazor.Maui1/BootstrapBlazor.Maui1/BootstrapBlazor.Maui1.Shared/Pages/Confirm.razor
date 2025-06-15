@@ -1,0 +1,16 @@
+﻿
+
+<div class="col-12 col-sm-12">
+    <BootstrapInputGroup>
+        <BootstrapInput @bind-Value="@BindValue"
+                        @ref="InputElemont"
+                        OnEnterAsync="@OnEnterAsync"
+                        IsShowLabel="true"
+                        DisplayText="Key" />
+        <Button Icon="fa-solid fas fa-key"
+                style="width:3rem"
+                OnClick="@OnClickAsync"></Button>
+    </BootstrapInputGroup>
+</div>
+
+
