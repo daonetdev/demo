@@ -1,0 +1,1 @@
+你好,在net framework4.7 Winform项目中，请帮忙实现虚拟键盘全功能，请帮忙给出完整实例与代码，MainForm.cs/MainForm.Designer.cs 分开提供完整实项项目代码
