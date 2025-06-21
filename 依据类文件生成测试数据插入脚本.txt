@@ -1,0 +1,15 @@
+你好，在NET环境下，请帮忙依据指定目录下.cs 类文件结构：如下 为SQLSERVER数据库表结构，请帮依据结构类型随即生成指定条数测试数据的INSERT 脚本依据数据库类型(需支持SQLITE,MySql,SQLSERVER,PostgreSql,Oracle)：
+表名称如Product
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+}
+以上请帮忙提供完整代码
+
+
+
+你好，请在以上基础上帮我扩展支持将自成动生成的insert脚本写到程式所在目录的txt文件中，需在文件开头附上对应数据库类型建表脚本，之后再跟上生成的insert 脚本
+
+你好，请帮忙再优化以上功能，支持将指定目录下所有.cs类型的文件批量产成脚本，请帮忙提供完整代码

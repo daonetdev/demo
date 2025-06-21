@@ -1,0 +1,50 @@
+
+你好，请参照仓库：https://github.com/DapperLib/Dapper 写一个访问mysql，
+oracle，sqlserver，sqlite，postgresql的共用类型项目（需提供完整项目结构与完整代码），
+需封装为接口供其它程式调用（其中oracle数据库需给出调用procedure方法,执行sql查询，获取资料返回CLOB类型，调用procedure方法返回Sys_refcursor数据集合），框架请使用.net8 ，项目注释请使用中文，
+项目之外需新增不同数据库的使用范例连接字符串需在appsettings.json中配置，
+请依据以上要求给出完整实现代码与项目结构
+
+
+你好，请帮我优化以上项目，连接Oracles数据库的实例支调用存储过程传参并返回Clob类型数据，返回返回Sys_refcursor数据集合，不同数据库的扩展方法请帮忙添加在共用类库中，调用时仅在初始化时传入连线字符串后，调用时只传入参数或查询SQL,请帮忙优化并提供完整代码
+
+
+
+你好，请帮我优化以上项目，连接Oracles数据库的实例支调用存储过程传参并返回Clob类型数据，返回返回Sys_refcursor数据集合，不同数据库的扩展方法请帮忙添加在共用类库中，调用时仅在初始化时传入连线字符串后，调用时只传入参数或查询SQL,请帮忙优化并提供完整代码
+
+
+你好，执行以上更新后DapperMultiDb.Examples出现如下错误-请帮忙修复并提供完整代码
+参数 3: 无法从“System.Data.DbType”转换为“Dapper.Oracle.OracleMappingType?”
+参数 2: 无法从“Oracle.ManagedDataAccess.Client.OracleDbType”转换为“Dapper.Oracle.OracleMappingType?”
+参数 2: 无法从“Oracle.ManagedDataAccess.Client.OracleDbType”转换为“Dapper.Oracle.OracleMappingType?”
+“SqlConnection”已过时:“Use the Microsoft.Data.SqlClient package instead.”
+
+执行以上更新后DapperMultiDb.Examples出现如下错误-请帮忙修复只需提供修改部份代码即可：
+参数 3: 无法从“Oracle.ManagedDataAccess.Client.OracleDbType”转换为“Dapper.Oracle.OracleMappingType?”
+参数 2: 无法从“Oracle.ManagedDataAccess.Client.OracleDbType”转换为“Dapper.Oracle.OracleMappingType?”
+参数 2: 无法从“Oracle.ManagedDataAccess.Client.OracleDbType”转换为“Dapper.Oracle.OracleMappingType?”
+
+
+你好，执行以上更新后DapperMultiDb.Examples debug运行到var description = p.Get<string>("p_description");时出现如下错误，请帮忙修复只需提供修改部份代码即可：
+System.Reflection.TargetInvocationException
+  HResult=0x80131604
+  Message=Exception has been thrown by the target of an invocation.
+  Source=System.Private.CoreLib
+  StackTrace:
+   在 System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+   在 System.Reflection.PropertyInfo.GetValue(Object obj)
+   在 Dapper.Oracle.OracleValueConverter.GetValue(Object value)
+   在 Dapper.Oracle.OracleValueConverter.Convert[T](Object value)
+   在 Dapper.Oracle.OracleDynamicParameters.Get[T](String name)
+   在 Program.Main(String[] args) 在 D:\source\repos\WEB\DapperMultiDbLibrary\DapperMultiDb.Examples\Program.cs 中: 第 41 行
+
+  此异常最初是在此调用堆栈中引发的: 
+    [外部代码]
+
+内部异常 1:
+InvalidOperationException: Invalid operation on a closed object
+
+
+
+
+你好，请依据Dapper跨数据库访问共享类库实现MCP数据库访问服务-请帮实现demo详细实例并提供完整代码

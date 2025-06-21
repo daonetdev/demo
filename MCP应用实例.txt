@@ -1,0 +1,6 @@
+你好，附件为一个访问数据库的MCP demo方案，请帮助我学习MCP与Ollama本地模型(最多只可以跑7b的模型)搭配实现数据查询与问答服务相关的DEMO，请帮忙提供详细说明与完整demo实例代码
+
+
+MCP与Ollama本地模型DEMO.html
+HTML 1.76MB
+你好，附件是关与MCP与Ollama本地模型通过MCP服务访问数据库的DEMO，但是参照上面的方案执行项目无法运行，请先分析附件，并依据需求使用(NET框架)重新提供详细完整的项目代码（现在已经有DapperMultiDbLibrary跨数据库访问共享类库）
